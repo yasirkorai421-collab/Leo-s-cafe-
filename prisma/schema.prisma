@@ -1,0 +1,408 @@
+// Leo's Cafe - Database Schema
+// Epic 1: Auth, DB Schema & Project Setup
+// Following Technical Architecture Section 4 and CLAUDE.md rules 16-17
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================================================
+// USERS & AUTH
+// ============================================================================
+
+enum UserRole {
+  user
+  admin
+}
+
+model User {
+  id              String    @id @default(uuid())
+  name            String
+  phone           String    @unique
+  email           String?
+  role            UserRole  @default(user)
+  birthday        DateTime?  // Added for birthday program (Epic 5)
+  loyaltyBalance  Int       @default(0) @map("loyalty_balance") // Denormalized for fast reads
+  lastOrderAt     DateTime? @map("last_order_at") // For win-back engine
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  // Relations
+  orders              Order[]
+  paymentVerifications PaymentProof[] @relation("VerifiedBy")
+  reviews             Review[]
+  loyaltyLedgerUser   LoyaltyLedger[] @relation("LoyaltyUser")
+  loyaltyLedgerCreator LoyaltyLedger[] @relation("LoyaltyCreator")
+  vouchers            Voucher[]
+  reviewPointClaimsUser   ReviewPointClaim[] @relation("ClaimUser")
+  reviewPointClaimsReviewer ReviewPointClaim[] @relation("ClaimReviewer")
+  favorites           Favorite[]
+  offersCreated       Offer[]    @relation("CreatedBy")
+  offersUpdated       Offer[]    @relation("UpdatedBy")
+  auditLogs           AuditLog[]
+
+  @@map("users")
+}
+
+// ============================================================================
+// MENU SYSTEM
+// ============================================================================
+
+model Category {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  imageUrl  String   @map("image_url")
+  sortOrder Int      @map("sort_order")
+  isActive  Boolean  @default(true) @map("is_active") // CLAUDE.md rule 17: soft delete
+  deletedAt DateTime? @map("deleted_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  // Relations
+  menuItems MenuItem[]
+
+  @@map("categories")
+}
+
+model MenuItem {
+  id           String    @id @default(uuid())
+  categoryId   String    @map("category_id")
+  name         String
+  slug         String    @unique
+  description  String
+  price        Decimal   @db.Decimal(10, 2)
+  imageUrl     String    @map("image_url")
+  modelUrl     String?   @map("model_url") // .glb model for 3D featured items
+  isAvailable  Boolean   @default(true) @map("is_available")
+  ratingsAvg   Decimal   @default(0) @db.Decimal(3, 2) @map("ratings_avg")
+  ratingsCount Int       @default(0) @map("ratings_count")
+  isActive     Boolean   @default(true) @map("is_active") // CLAUDE.md rule 17: soft delete
+  deletedAt    DateTime? @map("deleted_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at") // CLAUDE.md rule 18: optimistic concurrency
+  
+  // Relations
+  category        Category        @relation(fields: [categoryId], references: [id], onDelete: Restrict) // CLAUDE.md rule 16
+  customizations  Customization[]
+  orderItems      OrderItem[]
+  reviews         Review[]
+  favorites       Favorite[]
+
+  @@map("menu_items")
+}
+
+model Customization {
+  id       String  @id @default(uuid())
+  itemId   String  @map("item_id")
+  label    String
+  options  Json    // e.g. ["Small", "Medium", "Large"] or [{"name": "Extra Cheese", "price": 50}]
+  required Boolean @default(false)
+  isActive Boolean @default(true) @map("is_active") // CLAUDE.md rule 17: soft delete
+  deletedAt DateTime? @map("deleted_at")
+  
+  // Relations
+  item MenuItem @relation(fields: [itemId], references: [id], onDelete: Cascade) // CLAUDE.md rule 16: customizations belong to items
+
+  @@map("customizations")
+}
+
+// ============================================================================
+// ORDERS SYSTEM
+// ============================================================================
+
+enum OrderStatus {
+  pending_payment
+  payment_submitted
+  confirmed
+  preparing
+  ready
+  delivered
+  cancelled
+}
+
+enum PaymentStatus {
+  awaiting_screenshot
+  submitted
+  verified
+  rejected
+}
+
+enum OrderType {
+  delivery
+  dine_in
+}
+
+model Order {
+  id                String        @id @default(uuid())
+  userId            String        @map("user_id")
+  status            OrderStatus   @default(pending_payment)
+  paymentStatus     PaymentStatus @default(awaiting_screenshot) @map("payment_status")
+  orderType         OrderType     @default(delivery) @map("order_type") // Epic 6: dine-in support
+  tableSessionId    String?       @map("table_session_id") // Epic 6: link to table session
+  total             Decimal       @db.Decimal(10, 2)
+  deliveryAddress   String?       @map("delivery_address") // Null for dine-in orders
+  createdAt         DateTime      @default(now()) @map("created_at")
+  updatedAt         DateTime      @updatedAt @map("updated_at")
+  
+  // Relations
+  user          User           @relation(fields: [userId], references: [id], onDelete: Restrict) // CLAUDE.md rule 16
+  orderItems    OrderItem[]
+  paymentProofs PaymentProof[]
+  tableSession  TableSession?  @relation(fields: [tableSessionId], references: [id], onDelete: SetNull) // CLAUDE.md rule 16
+  voucherUsed   Voucher?       @relation("VoucherUsed")
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id             String  @id @default(uuid())
+  orderId        String  @map("order_id")
+  itemId         String  @map("item_id")
+  quantity       Int
+  customization  Json?   // Snapshot of chosen options at order time
+  itemPrice      Decimal @db.Decimal(10, 2) @map("item_price") // Snapshot, not live join
+  
+  // Relations
+  order Order    @relation(fields: [orderId], references: [id], onDelete: Cascade) // CLAUDE.md rule 16: cascade delete with order
+  item  MenuItem @relation(fields: [itemId], references: [id], onDelete: Restrict) // CLAUDE.md rule 16: preserve history
+
+  @@map("order_items")
+}
+
+enum PaymentProofStatus {
+  submitted
+  verified
+  rejected
+}
+
+model PaymentProof {
+  id            String             @id @default(uuid())
+  orderId       String             @map("order_id")
+  screenshotUrl String             @map("screenshot_url") // Private Cloudinary URL
+  status        PaymentProofStatus @default(submitted)
+  uploadedAt    DateTime           @default(now()) @map("uploaded_at")
+  verifiedBy    String?            @map("verified_by")
+  verifiedAt    DateTime?          @map("verified_at")
+  
+  // Relations
+  order    Order  @relation(fields: [orderId], references: [id], onDelete: Cascade) // CLAUDE.md rule 16
+  verifier User?  @relation("VerifiedBy", fields: [verifiedBy], references: [id], onDelete: SetNull) // CLAUDE.md rule 16
+
+  @@map("payment_proofs")
+}
+
+// ============================================================================
+// REVIEWS
+// ============================================================================
+
+model Review {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  itemId    String   @map("item_id")
+  rating    Int      @db.SmallInt // 1-5
+  comment   String?  @db.Text // Sanitized before storage
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  // Relations
+  user User     @relation(fields: [userId], references: [id], onDelete: Cascade) // CLAUDE.md rule 16
+  item MenuItem @relation(fields: [itemId], references: [id], onDelete: Restrict) // CLAUDE.md rule 16
+
+  @@map("reviews")
+}
+
+// ============================================================================
+// OFFERS & LOYALTY (Epic 5)
+// ============================================================================
+
+enum DiscountType {
+  percent
+  flat
+}
+
+model Offer {
+  id            String       @id @default(uuid())
+  title         String
+  description   String       @db.Text
+  imageUrl      String       @map("image_url")
+  discountType  DiscountType @map("discount_type")
+  discountValue Decimal      @db.Decimal(10, 2) @map("discount_value")
+  code          String?      @unique // Null for automatic/banner offers
+  startsAt      DateTime     @map("starts_at")
+  endsAt        DateTime     @map("ends_at")
+  isActive      Boolean      @default(true) @map("is_active")
+  isFeatured    Boolean      @default(false) @map("is_featured")
+  createdBy     String       @map("created_by")
+  updatedBy     String?      @map("updated_by")
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @updatedAt @map("updated_at")
+  
+  // Relations
+  creator User  @relation("CreatedBy", fields: [createdBy], references: [id], onDelete: Restrict) // CLAUDE.md rule 16
+  updater User? @relation("UpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull) // CLAUDE.md rule 16
+
+  @@map("offers")
+}
+
+enum LoyaltyLedgerType {
+  earn_purchase
+  earn_google_review
+  earn_referral
+  redeem
+  birthday_bonus
+  adjustment
+}
+
+model LoyaltyLedger {
+  id          String             @id @default(uuid())
+  userId      String             @map("user_id")
+  orderId     String?            @map("order_id") // Set for purchase-based entries
+  type        LoyaltyLedgerType
+  points      Int                // Positive for earn, negative for redeem
+  description String             @db.Text
+  createdBy   String?            @map("created_by") // Set for manual admin adjustments
+  createdAt   DateTime           @default(now()) @map("created_at")
+  
+  // Relations
+  user    User  @relation("LoyaltyUser", fields: [userId], references: [id], onDelete: Cascade) // CLAUDE.md rule 16
+  creator User? @relation("LoyaltyCreator", fields: [createdBy], references: [id], onDelete: SetNull) // CLAUDE.md rule 16 (self-referencing)
+
+  @@map("loyalty_ledger")
+}
+
+enum VoucherType {
+  birthday
+  winback
+  loyalty_redemption
+  manual
+}
+
+enum VoucherStatus {
+  active
+  used
+  expired
+}
+
+model Voucher {
+  id            String        @id @default(uuid())
+  userId        String        @map("user_id")
+  code          String        @unique
+  type          VoucherType
+  discountType  DiscountType  @map("discount_type")
+  discountValue Decimal       @db.Decimal(10, 2) @map("discount_value")
+  status        VoucherStatus @default(active)
+  issuedAt      DateTime      @default(now()) @map("issued_at")
+  expiresAt     DateTime      @map("expires_at")
+  usedAt        DateTime?     @map("used_at")
+  usedOnOrderId String?       @unique @map("used_on_order_id")
+  
+  // Relations
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade) // CLAUDE.md rule 16
+  order Order? @relation("VoucherUsed", fields: [usedOnOrderId], references: [id], onDelete: SetNull) // CLAUDE.md rule 16
+
+  @@map("vouchers")
+}
+
+enum ReviewClaimStatus {
+  pending
+  approved
+  rejected
+}
+
+model ReviewPointClaim {
+  id          String            @id @default(uuid())
+  userId      String            @map("user_id")
+  evidenceUrl String?           @map("evidence_url") @db.Text
+  status      ReviewClaimStatus @default(pending)
+  reviewedBy  String?           @map("reviewed_by")
+  reviewedAt  DateTime?         @map("reviewed_at")
+  createdAt   DateTime          @default(now()) @map("created_at")
+  
+  // Relations
+  user     User  @relation("ClaimUser", fields: [userId], references: [id], onDelete: Cascade) // CLAUDE.md rule 16
+  reviewer User? @relation("ClaimReviewer", fields: [reviewedBy], references: [id], onDelete: SetNull) // CLAUDE.md rule 16 (self-referencing)
+
+  @@map("review_point_claims")
+}
+
+// ============================================================================
+// DINE-IN QR ORDERING (Epic 6)
+// ============================================================================
+
+model Table {
+  id        String    @id @default(uuid())
+  label     String    // e.g. "Table 5"
+  qrToken   String    @map("qr_token") // Current signed token version
+  qrVersion Int       @default(1) @map("qr_version") // Incremented on rotation
+  isActive  Boolean   @default(true) @map("is_active")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  
+  // Relations
+  sessions TableSession[]
+
+  @@map("tables")
+}
+
+enum SessionStatus {
+  active
+  closed
+  expired
+}
+
+model TableSession {
+  id           String        @id @default(uuid())
+  tableId      String        @map("table_id")
+  sessionToken String        @unique @map("session_token") // Random value for cookie
+  status       SessionStatus @default(active)
+  startedAt    DateTime      @default(now()) @map("started_at")
+  expiresAt    DateTime      @map("expires_at")
+  closedAt     DateTime?     @map("closed_at")
+  
+  // Relations
+  table  Table   @relation(fields: [tableId], references: [id], onDelete: Cascade) // CLAUDE.md rule 16
+  orders Order[]
+
+  // CLAUDE.md rule 12: DB-level uniqueness constraint for one active session per table
+  @@unique([tableId, status], name: "unique_active_session_per_table", map: "unique_active_session")
+  @@index([sessionToken])
+  @@map("table_sessions")
+}
+
+// ============================================================================
+// FAVORITES (Epic 7)
+// ============================================================================
+
+model Favorite {
+  userId    String   @map("user_id")
+  itemId    String   @map("item_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  // Relations
+  user User     @relation(fields: [userId], references: [id], onDelete: Cascade) // CLAUDE.md rule 16
+  item MenuItem @relation(fields: [itemId], references: [id], onDelete: Cascade) // CLAUDE.md rule 16
+
+  @@id([userId, itemId])
+  @@map("favorites")
+}
+
+// ============================================================================
+// AUDIT LOG (Epic 4) - CLAUDE.md rule 15: append-only
+// ============================================================================
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id") // Admin who performed the action
+  action    String   // e.g. "ORDER_STATUS_CHANGED", "PAYMENT_VERIFIED", "MENU_ITEM_UPDATED"
+  entityType String  @map("entity_type") // e.g. "order", "menu_item", "payment_proof"
+  entityId  String   @map("entity_id") // UUID of the affected entity
+  details   Json?    // Additional context
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict) // CLAUDE.md rule 16
+
+  @@map("audit_log")
+}
