@@ -1,15 +1,16 @@
 /**
  * Next.js Middleware for Route Protection
  * Epic 1 - Auth & Route Protection
- * 
- * Enforces the access control matrix from Security & Access Section 5
- * CLAUDE.md rule 4: Defense in depth - middleware + per-handler checks
+ *
+ * Enforces the access control matrix from Security & Access Section 5.
+ * CLAUDE.md rule 4: Defense in depth - middleware + per-handler checks.
+ *
+ * Clerk v6 compatible.
  */
 
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-// Define route matchers
 const isPublicRoute = createRouteMatcher([
   "/",
   "/menu(.*)",
@@ -18,7 +19,9 @@ const isPublicRoute = createRouteMatcher([
   "/privacy",
   "/auth/login",
   "/auth/signup",
-  "/api/menu(.*)", // Public menu API
+  "/api/menu(.*)",         // Public menu API
+  "/api/webhooks/(.*)",    // Clerk webhook must be public
+  "/api/dine/scan(.*)",    // QR scan - auth checked inside handler
 ]);
 
 const isAdminRoute = createRouteMatcher([
@@ -33,7 +36,8 @@ const isAuthRoute = createRouteMatcher([
 
 export default clerkMiddleware(async (auth, req) => {
   const { userId, sessionClaims } = await auth();
-  const isAdmin = (sessionClaims?.metadata as { role?: string })?.role === "admin";
+  const isAdmin =
+    (sessionClaims?.metadata as { role?: string } | undefined)?.role === "admin";
 
   // Public routes - allow everyone
   if (isPublicRoute(req)) {
@@ -50,7 +54,7 @@ export default clerkMiddleware(async (auth, req) => {
   // Admin routes - require admin role
   if (isAdminRoute(req)) {
     if (!isAdmin) {
-      // CLAUDE.md: Return 404 to non-admin, not 403
+      // CLAUDE.md rule 7: Return 404 to non-admin, not 403
       return new NextResponse("Not Found", { status: 404 });
     }
   }
@@ -65,9 +69,7 @@ export default clerkMiddleware(async (auth, req) => {
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files
     "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    // Always run for API routes
     "/(api|trpc)(.*)",
   ],
 };

@@ -7,7 +7,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // ============================================================================
@@ -21,11 +23,12 @@ enum UserRole {
 
 model User {
   id              String    @id @default(uuid())
+  clerkId         String    @unique @map("clerk_id") // Clerk's user_xxx ID - links Clerk auth to our DB
   name            String
   phone           String    @unique
   email           String?
   role            UserRole  @default(user)
-  birthday        DateTime?  // Added for birthday program (Epic 5)
+  birthday        DateTime? // Added for birthday program (Epic 5)
   loyaltyBalance  Int       @default(0) @map("loyalty_balance") // Denormalized for fast reads
   lastOrderAt     DateTime? @map("last_order_at") // For win-back engine
   createdAt       DateTime  @default(now()) @map("created_at")
