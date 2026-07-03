@@ -6,7 +6,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useUser } from "@clerk/nextjs";
+import { createClient } from "@/utils/supabase/client";
 
 interface LoyaltyData {
   balance: number;
@@ -34,7 +34,6 @@ interface LoyaltyData {
 }
 
 export default function RewardsPage() {
-  const { user } = useUser();
   const [data, setData] = useState<LoyaltyData | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);

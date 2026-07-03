@@ -5,7 +5,7 @@
  */
 
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { createClient } from "@/utils/supabase/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
@@ -15,10 +15,15 @@ const addFavoriteSchema = z.object({
 
 export async function GET(request: Request) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
+    const supabase = await createClient();
+    const {
+      data: { user: authUser },
+    } = await supabase.auth.getUser();
+
+    if (!authUser) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+    const userId = authUser.id;
 
     // CLAUDE.md rule 1: Scoped to session user
     const favorites = await prisma.favorite.findMany({
@@ -51,10 +56,15 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
+    const supabase = await createClient();
+    const {
+      data: { user: authUser },
+    } = await supabase.auth.getUser();
+
+    if (!authUser) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+    const userId = authUser.id;
 
     const body = await request.json();
     const validation = addFavoriteSchema.safeParse(body);

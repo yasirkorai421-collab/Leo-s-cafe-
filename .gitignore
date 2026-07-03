@@ -41,3 +41,6 @@ prisma/migrations/
 # editor
 .vscode/
 .idea/
+
+# clerk configuration (can include secrets)
+/.clerk/

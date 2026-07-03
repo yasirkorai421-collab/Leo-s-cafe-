@@ -1,7 +1,6 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  darkMode: ["class"],
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -11,47 +10,24 @@ const config: Config = {
     extend: {
       fontFamily: {
         sans: ["var(--font-poppins)", "sans-serif"],
-        serif: ["var(--font-playfair)", "serif"],
-      },
-      borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        heading: ["var(--font-baloo)", "sans-serif"],
+        script: ["var(--font-alex)", "cursive"],
       },
       colors: {
-        background: "oklch(var(--background) / <alpha-value>)",
-        foreground: "oklch(var(--foreground) / <alpha-value>)",
-        card: {
-          DEFAULT: "oklch(var(--card) / <alpha-value>)",
-          foreground: "oklch(var(--card-foreground) / <alpha-value>)",
-        },
-        popover: {
-          DEFAULT: "oklch(var(--popover) / <alpha-value>)",
-          foreground: "oklch(var(--popover-foreground) / <alpha-value>)",
-        },
-        primary: {
-          DEFAULT: "oklch(var(--primary) / <alpha-value>)",
-          foreground: "oklch(var(--primary-foreground) / <alpha-value>)",
-        },
-        secondary: {
-          DEFAULT: "oklch(var(--secondary) / <alpha-value>)",
-          foreground: "oklch(var(--secondary-foreground) / <alpha-value>)",
-        },
-        muted: {
-          DEFAULT: "oklch(var(--muted) / <alpha-value>)",
-          foreground: "oklch(var(--muted-foreground) / <alpha-value>)",
-        },
         accent: {
-          DEFAULT: "oklch(var(--accent) / <alpha-value>)",
-          foreground: "oklch(var(--accent-foreground) / <alpha-value>)",
+          DEFAULT: "var(--color-accent)",
+          hover: "var(--color-accent-hover)",
         },
-        destructive: {
-          DEFAULT: "oklch(var(--destructive) / <alpha-value>)",
-          foreground: "oklch(var(--destructive-foreground) / <alpha-value>)",
-        },
-        border: "oklch(var(--border) / <alpha-value>)",
-        input: "oklch(var(--input) / <alpha-value>)",
-        ring: "oklch(var(--ring) / <alpha-value>)",
+        black: "var(--color-black)",
+        heading: "var(--color-heading)",
+        "body-gray": "var(--color-body-gray)",
+        "label-gray": "var(--color-label-gray)",
+        "border-light": "var(--color-border-light)",
+        white: "var(--color-white)",
+        "bg-page": "var(--bg-page)",
+        "bg-section-alt": "var(--bg-section-alt)",
+        "bg-tab-inactive": "var(--bg-tab-inactive)",
+        "bg-dark-panel": "var(--bg-dark-panel)",
       },
     },
   },

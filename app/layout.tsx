@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { Poppins, Playfair_Display } from "next/font/google";
-import { ClerkProvider } from "@clerk/nextjs";
+import { Poppins, Baloo_2, Alex_Brush } from "next/font/google";
+import SiteHeader from "@/components/SiteHeader";
+import Footer from "@/components/Footer";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -10,16 +11,23 @@ const poppins = Poppins({
   display: "swap",
 });
 
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
+const baloo = Baloo_2({
+  variable: "--font-baloo",
   subsets: ["latin"],
-  weight: ["400", "600", "700"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+});
+
+const alexBrush = Alex_Brush({
+  variable: "--font-alex",
+  subsets: ["latin"],
+  weight: ["400"],
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Leo's Cafe - Online Ordering | Kot Addu",
-  description: "Order delicious food from Leo's Cafe in Kot Addu. Browse our menu, customize your order, and enjoy fast delivery.",
+  title: "Feliciano Restaurant",
+  description: "Best Restaurant in town. Nutritious & Tasty.",
 };
 
 export default function RootLayout({
@@ -28,13 +36,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
-      <html
-        lang="en"
-        className={`${poppins.variable} ${playfair.variable} h-full antialiased`}
-      >
-        <body className="min-h-full flex flex-col font-sans">{children}</body>
-      </html>
-    </ClerkProvider>
+    <html
+      lang="en"
+      className={`${poppins.variable} ${baloo.variable} ${alexBrush.variable} h-full antialiased`}
+    >
+      <body className="min-h-full flex flex-col font-sans bg-page text-body-gray">
+        <SiteHeader />
+        {children}
+        <Footer />
+      </body>
+    </html>
   );
 }

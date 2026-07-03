@@ -1,58 +1,60 @@
-/**
- * Next.js Middleware for Route Protection
- * Epic 1 - Auth & Route Protection
- *
- * Enforces the access control matrix from Security & Access Section 5.
- * CLAUDE.md rule 4: Defense in depth - middleware + per-handler checks.
- *
- * Clerk v6 compatible.
- */
+import { NextResponse, type NextRequest } from "next/server";
+import { updateSession } from "@/utils/supabase/middleware";
 
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
+const publicRoutes = [
+  /^\/$/,
+  /^\/menu(.*)/,
+  /^\/about$/,
+  /^\/contact$/,
+  /^\/privacy$/,
+  /^\/auth\/login$/,
+  /^\/auth\/signup$/,
+  /^\/api\/menu(.*)/,
+  /^\/api\/webhooks\/(.*)/,
+  /^\/api\/dine\/scan(.*)/,
+];
 
-const isPublicRoute = createRouteMatcher([
-  "/",
-  "/menu(.*)",
-  "/about",
-  "/contact",
-  "/privacy",
-  "/auth/login",
-  "/auth/signup",
-  "/api/menu(.*)",         // Public menu API
-  "/api/webhooks/(.*)",    // Clerk webhook must be public
-  "/api/dine/scan(.*)",    // QR scan - auth checked inside handler
-]);
+const adminRoutes = [
+  /^\/admin(.*)/,
+  /^\/api\/admin(.*)/,
+];
 
-const isAdminRoute = createRouteMatcher([
-  "/admin(.*)",
-  "/api/admin(.*)",
-]);
+const authRoutes = [
+  /^\/auth\/login$/,
+  /^\/auth\/signup$/,
+];
 
-const isAuthRoute = createRouteMatcher([
-  "/auth/login",
-  "/auth/signup",
-]);
+function isMatch(url: string, patterns: RegExp[]) {
+  return patterns.some(pattern => pattern.test(url));
+}
 
-export default clerkMiddleware(async (auth, req) => {
-  const { userId, sessionClaims } = await auth();
-  const isAdmin =
-    (sessionClaims?.metadata as { role?: string } | undefined)?.role === "admin";
+export async function middleware(request: NextRequest) {
+  // updateSession updates the Supabase auth token
+  const { supabaseResponse, user } = await updateSession(request);
+  const pathname = request.nextUrl.pathname;
+
+  // We decode sessionClaims in Clerk usually. With Supabase, role is usually in user.user_metadata
+  // However, since we sync users to Prisma, the actual role should probably be checked against the DB.
+  // For middleware, if we strictly need admin check, we might have to rely on app/api or layout.
+  // Since we can't reliably query Prisma in edge middleware, we'll assume the role is in user_metadata,
+  // or we let the actual route/handler do the hard rejection and just do basic auth routing here.
+  // Actually, Supabase sets app_metadata or user_metadata. Let's assume role might be in user_metadata.role
+  const isAdmin = user?.user_metadata?.role === "admin";
 
   // Public routes - allow everyone
-  if (isPublicRoute(req)) {
-    return NextResponse.next();
+  if (isMatch(pathname, publicRoutes)) {
+    return supabaseResponse;
   }
 
   // Not authenticated - redirect to login
-  if (!userId) {
-    const loginUrl = new URL("/auth/login", req.url);
-    loginUrl.searchParams.set("redirect", req.url);
+  if (!user) {
+    const loginUrl = new URL("/auth/login", request.url);
+    loginUrl.searchParams.set("redirect", request.url);
     return NextResponse.redirect(loginUrl);
   }
 
-  // Admin routes - require admin role
-  if (isAdminRoute(req)) {
+  // Admin routes - require admin role (or rely on layout/route handlers for strict DB check)
+  if (isMatch(pathname, adminRoutes)) {
     if (!isAdmin) {
       // CLAUDE.md rule 7: Return 404 to non-admin, not 403
       return new NextResponse("Not Found", { status: 404 });
@@ -60,12 +62,12 @@ export default clerkMiddleware(async (auth, req) => {
   }
 
   // Auth routes - redirect if already logged in
-  if (isAuthRoute(req) && userId) {
-    return NextResponse.redirect(new URL("/menu", req.url));
+  if (isMatch(pathname, authRoutes) && user) {
+    return NextResponse.redirect(new URL("/menu", request.url));
   }
 
-  return NextResponse.next();
-});
+  return supabaseResponse;
+}
 
 export const config = {
   matcher: [

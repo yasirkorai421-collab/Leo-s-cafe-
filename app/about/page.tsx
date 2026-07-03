@@ -1,10 +1,9 @@
-import HeroCarousel from "@/components/HeroCarousel";
+import Breadcrumb from "@/components/Breadcrumb";
 import StatsCounter from "@/components/StatsCounter";
 import ChefCarousel from "@/components/ChefCarousel";
 import TestimonyCarousel from "@/components/TestimonyCarousel";
 import ReservationForm from "@/components/ReservationForm";
 
-// ── SVG service icons (outline / thin-line style) ──────────────────────────
 function CakeIcon() {
   return (
     <svg className="w-14 h-14" viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
@@ -53,13 +52,32 @@ const services = [
   },
 ];
 
-export default function Home() {
+export default function AboutPage() {
   return (
     <main>
-      {/* ── Hero Carousel ── */}
-      <HeroCarousel />
+      {/* ── Page Hero Banner ── */}
+      <section className="relative h-[400px] flex flex-col items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <img
+            src="https://images.unsplash.com/photo-1414235077428-338988a2e8c0?q=80&w=2070&h=1380&fit=crop"
+            alt="About Feliciano"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-black/60" />
+        </div>
 
-      {/* ── About Preview ── */}
+        <div className="relative z-10 text-center px-4 mt-16">
+          <h1
+            className="font-heading font-bold text-white uppercase mb-2"
+            style={{ fontSize: "clamp(2rem, 5vw, 2.5rem)", letterSpacing: "2px" }}
+          >
+            About
+          </h1>
+          <Breadcrumb paths={[{ label: "About" }]} />
+        </div>
+      </section>
+
+      {/* ── About Section ── */}
       <section className="py-20" style={{ background: "var(--bg-page)" }}>
         <div className="container mx-auto px-4">
           <div className="flex flex-col lg:flex-row items-center lg:items-stretch gap-12">
@@ -81,16 +99,21 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Text block */}
+            {/* Text */}
             <div className="w-full lg:w-1/2 flex flex-col justify-center">
               <div className="section-heading !text-left !mb-6">
                 <span className="script-accent">About</span>
                 <h2 className="bold-title">Feliciano Restaurant</h2>
               </div>
-              <p className="mb-6 leading-relaxed" style={{ color: "var(--color-body-gray)" }}>
+              <p className="mb-4 leading-relaxed" style={{ color: "var(--color-body-gray)" }}>
                 Nestled in the heart of the city, Feliciano brings together the warmth of home cooking
                 and the craft of fine dining. Every dish is made from locally sourced ingredients,
                 prepared fresh daily by our passionate team of chefs.
+              </p>
+              <p className="mb-6 leading-relaxed" style={{ color: "var(--color-body-gray)" }}>
+                Founded in 2007, we have spent nearly two decades perfecting our craft — blending
+                traditional recipes with contemporary techniques to create a menu that speaks to
+                every palate.
               </p>
               <p className="mb-8">
                 <strong className="text-black block">Mon – Fri &nbsp;8 AM – 11 PM</strong>
@@ -150,7 +173,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Happy Customer ── */}
+      {/* ── Testimony ── */}
       <section className="py-20" style={{ background: "var(--bg-section-alt)" }}>
         <div className="container mx-auto px-4">
           <div className="section-heading">

@@ -9,7 +9,7 @@
  * object-level authorization (IDOR prevention).
  */
 
-import { auth } from "@clerk/nextjs/server";
+import { createClient } from "@/utils/supabase/server";
 import { prisma } from "./prisma";
 
 export type OwnershipCheckResult =
@@ -26,15 +26,20 @@ export type OwnershipCheckResult =
 export async function checkOrderOwnership(
   orderId: string
 ): Promise<OwnershipCheckResult> {
-  const { userId: clerkUserId } = await auth();
+  const supabase = await createClient();
+  const {
+    data: { user: authUser },
+  } = await supabase.auth.getUser();
 
-  if (!clerkUserId) {
+  if (!authUser) {
     return { authorized: false, reason: "unauthenticated" };
   }
 
+  const userId = authUser.id;
+
   // Get user from database to check role
   const user = await prisma.user.findUnique({
-    where: { id: clerkUserId },
+    where: { id: userId },
     select: { id: true, role: true },
   });
 
@@ -75,14 +80,19 @@ export async function checkOrderOwnership(
 export async function checkUserDataOwnership(
   targetUserId: string
 ): Promise<OwnershipCheckResult> {
-  const { userId: clerkUserId } = await auth();
+  const supabase = await createClient();
+  const {
+    data: { user: authUser },
+  } = await supabase.auth.getUser();
 
-  if (!clerkUserId) {
+  if (!authUser) {
     return { authorized: false, reason: "unauthenticated" };
   }
 
+  const userId = authUser.id;
+
   const user = await prisma.user.findUnique({
-    where: { id: clerkUserId },
+    where: { id: userId },
     select: { id: true, role: true },
   });
 
@@ -115,14 +125,19 @@ export async function getCurrentUser(): Promise<{
   userId: string;
   isAdmin: boolean;
 } | null> {
-  const { userId: clerkUserId } = await auth();
+  const supabase = await createClient();
+  const {
+    data: { user: authUser },
+  } = await supabase.auth.getUser();
 
-  if (!clerkUserId) {
+  if (!authUser) {
     return null;
   }
 
+  const userId = authUser.id;
+
   const user = await prisma.user.findUnique({
-    where: { id: clerkUserId },
+    where: { id: userId },
     select: { id: true, role: true },
   });
 

@@ -4,8 +4,8 @@
  */
 
 import { notFound } from "next/navigation";
-import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { createClient } from "@/utils/supabase/server";
 
 // Force dynamic rendering
 export const dynamic = "force-dynamic";
@@ -15,8 +15,14 @@ export default async function TrackOrderPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { userId } = await auth();
   const { id } = await params;
+  
+  const supabase = await createClient();
+  const {
+    data: { user: authUser },
+  } = await supabase.auth.getUser();
+
+  const userId = authUser?.id;
   
   if (!userId) {
     return (
