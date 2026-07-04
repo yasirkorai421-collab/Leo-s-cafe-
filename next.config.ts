@@ -22,7 +22,12 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     serverActions: {
-      allowedOrigins: ["localhost:3000", "localhost:3001"],
+      allowedOrigins: [
+        "localhost:3000", 
+        "localhost:3001",
+        "*.vercel.app",
+        "leos-cafe.vercel.app"
+      ],
     },
   },
   // React strict mode for better error detection
