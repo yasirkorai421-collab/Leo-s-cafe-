@@ -28,7 +28,10 @@ model User {
   phone           String    @unique
   email           String?
   role            UserRole  @default(user)
-  birthday        DateTime? // Added for birthday program (Epic 5)
+  birthday        DateTime? // For birthday rewards & notifications
+  birthdayNotificationSent DateTime? @map("birthday_notification_sent") // Track if notification sent this year
+  googleReviewSubmitted Boolean @default(false) @map("google_review_submitted") // Track if user submitted Google review
+  googleReviewClaimedAt DateTime? @map("google_review_claimed_at") // When they claimed review points
   loyaltyBalance  Int       @default(0) @map("loyalty_balance") // Denormalized for fast reads
   lastOrderAt     DateTime? @map("last_order_at") // For win-back engine
   createdAt       DateTime  @default(now()) @map("created_at")
@@ -117,20 +120,27 @@ model Customization {
 // ============================================================================
 
 enum OrderStatus {
-  pending_payment
-  payment_submitted
-  confirmed
-  preparing
-  ready
-  delivered
-  cancelled
+  pending_payment      // Waiting for payment method selection
+  payment_cod          // Cash on Delivery selected
+  payment_whatsapp     // WhatsApp screenshot uploaded
+  confirmed            // Admin verified payment
+  preparing           // Kitchen is preparing
+  ready               // Ready for pickup/delivery
+  delivered           // Completed
+  cancelled           // Cancelled
+}
+
+enum PaymentMethod {
+  cash_on_delivery
+  whatsapp_screenshot
 }
 
 enum PaymentStatus {
-  awaiting_screenshot
-  submitted
-  verified
-  rejected
+  pending              // No payment method selected yet
+  cod_selected         // COD chosen
+  screenshot_uploaded  // WhatsApp screenshot uploaded
+  verified             // Admin verified
+  rejected             // Admin rejected screenshot
 }
 
 enum OrderType {
@@ -142,11 +152,13 @@ model Order {
   id                String        @id @default(uuid())
   userId            String        @map("user_id")
   status            OrderStatus   @default(pending_payment)
-  paymentStatus     PaymentStatus @default(awaiting_screenshot) @map("payment_status")
+  paymentMethod     PaymentMethod? @map("payment_method") // COD or WhatsApp
+  paymentStatus     PaymentStatus @default(pending) @map("payment_status")
   orderType         OrderType     @default(delivery) @map("order_type") // Epic 6: dine-in support
   tableSessionId    String?       @map("table_session_id") // Epic 6: link to table session
   total             Decimal       @db.Decimal(10, 2)
   deliveryAddress   String?       @map("delivery_address") // Null for dine-in orders
+  adminNotes        String?       @map("admin_notes") @db.Text // Admin can add notes
   createdAt         DateTime      @default(now()) @map("created_at")
   updatedAt         DateTime      @updatedAt @map("updated_at")
   
