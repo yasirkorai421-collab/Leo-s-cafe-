@@ -60,11 +60,11 @@ export default function AboutPage() {
       <section className="relative h-[400px] flex flex-col items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
-            src="https://images.unsplash.com/photo-1414235077428-338988a2e8c0?q=80&w=1920&fit=crop&auto=format"
+            src="https://images.unsplash.com/photo-1414235077428-338988a2e8c0?q=60&w=1200&fit=crop&auto=format"
             alt="About Leo's Café"
             fill
             priority
-            quality={85}
+            quality={60}
             sizes="100vw"
             className="object-cover"
           />

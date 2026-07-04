@@ -9,11 +9,11 @@ export default function ReservationForm() {
       <section className="relative py-20 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
-            src="https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?q=80&w=1920&h=600&fit=crop&auto=format"
+            src="https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?q=60&w=1200&h=600&fit=crop&auto=format"
             alt="Book a Table"
             fill
             sizes="100vw"
-            quality={85}
+            quality={60}
             className="object-cover"
             loading="lazy"
           />

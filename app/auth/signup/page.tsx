@@ -4,6 +4,7 @@ import { useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -441,13 +442,19 @@ export default function SignUpPage() {
       </div>
 
       {/* Right Side - Image/Branding */}
-      <div 
-        className="hidden lg:flex lg:w-1/2 relative bg-cover bg-center"
-        style={{
-          backgroundImage: "linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=1200&fit=crop')"
-        }}
-      >
-        <div className="flex flex-col justify-center items-center w-full p-12 text-white">
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
+        <Image
+          src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=60&w=1000&fit=crop"
+          alt="Leo's Café"
+          fill
+          priority
+          quality={60}
+          sizes="50vw"
+          className="object-cover"
+        />
+        <div className="absolute inset-0 bg-black/50 z-10" />
+        
+        <div className="flex flex-col justify-center items-center w-full p-12 text-white relative z-20">
           <div className="max-w-md text-center">
             <h1 className="font-heading font-bold text-5xl mb-4">
               Leo's Café

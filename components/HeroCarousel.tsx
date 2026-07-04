@@ -6,19 +6,19 @@ import Image from "next/image";
 const slides = [
   {
     id: 1,
-    img: "https://images.unsplash.com/photo-1414235077428-338988a2e8c0?q=80&w=1920&fit=crop&auto=format",
+    img: "https://images.unsplash.com/photo-1414235077428-338988a2e8c0?q=60&w=1200&fit=crop&auto=format",
     script: "Leo's Café",
     subtitle: "KOT ADDU'S FAVORITE",
   },
   {
     id: 2,
-    img: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1920&fit=crop&auto=format",
+    img: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=60&w=1200&fit=crop&auto=format",
     script: "Leo's Café",
     subtitle: "PIZZA & FAST FOOD",
   },
   {
     id: 3,
-    img: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1920&fit=crop&auto=format",
+    img: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=60&w=1200&fit=crop&auto=format",
     script: "Leo's Café",
     subtitle: "OPEN LATE EVERY DAY",
   },
@@ -60,7 +60,7 @@ export default function HeroCarousel() {
             alt={slide.subtitle}
             fill
             priority={i === 0}
-            quality={85}
+            quality={60}
             sizes="100vw"
             className="object-cover"
           />
