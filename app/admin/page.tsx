@@ -41,27 +41,34 @@ export default async function AdminDashboard() {
 
       <div className="container mx-auto px-4 py-8">
         {/* Quick Links */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-8">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
           <Link
             href="/admin/orders"
             className="rounded-lg border border-border bg-card p-6 hover:bg-accent transition-colors"
           >
-            <h3 className="font-semibold text-lg mb-2">Orders</h3>
+            <h3 className="font-semibold text-lg mb-2">📦 Orders</h3>
             <p className="text-sm text-muted-foreground">Manage and track orders</p>
           </Link>
           <Link
-            href="/admin/menu"
+            href="/admin/users"
             className="rounded-lg border border-border bg-card p-6 hover:bg-accent transition-colors"
           >
-            <h3 className="font-semibold text-lg mb-2">Menu</h3>
-            <p className="text-sm text-muted-foreground">Edit items and categories</p>
+            <h3 className="font-semibold text-lg mb-2">👥 Users</h3>
+            <p className="text-sm text-muted-foreground">Create & manage accounts</p>
+          </Link>
+          <Link
+            href="/admin/customers"
+            className="rounded-lg border border-border bg-card p-6 hover:bg-accent transition-colors"
+          >
+            <h3 className="font-semibold text-lg mb-2">🎁 Customers</h3>
+            <p className="text-sm text-muted-foreground">Loyalty & birthdays</p>
           </Link>
           <Link
             href="/admin/settings"
             className="rounded-lg border border-border bg-card p-6 hover:bg-accent transition-colors"
           >
-            <h3 className="font-semibold text-lg mb-2">Settings</h3>
-            <p className="text-sm text-muted-foreground">Configure payment and loyalty</p>
+            <h3 className="font-semibold text-lg mb-2">⚙️ Settings</h3>
+            <p className="text-sm text-muted-foreground">Configure system</p>
           </Link>
         </div>
 

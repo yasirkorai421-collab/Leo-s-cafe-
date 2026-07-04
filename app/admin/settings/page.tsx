@@ -6,6 +6,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 interface Settings {
   payment: {
@@ -37,6 +38,8 @@ interface Settings {
 export default function AdminSettingsPage() {
   const [settings, setSettings] = useState<Settings | null>(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [editMode, setEditMode] = useState(false);
 
   useEffect(() => {
     fetchSettings();
@@ -50,17 +53,50 @@ export default function AdminSettingsPage() {
       setSettings(data);
     } catch (error) {
       console.error(error);
-      alert("Failed to load settings");
+      toast.error("Failed to load settings");
     } finally {
       setLoading(false);
     }
   };
 
+  const handleSaveSettings = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(settings),
+      });
+
+      if (!res.ok) throw new Error("Failed to save settings");
+      
+      toast.success("Settings saved successfully!");
+      setEditMode(false);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to save settings");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const updateSetting = (section: keyof Settings, key: string, value: any) => {
+    if (!settings) return;
+    setSettings({
+      ...settings,
+      [section]: {
+        ...settings[section],
+        [key]: value,
+      },
+    });
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 p-8">
-        <div className="max-w-4xl mx-auto">
-          <p>Loading settings...</p>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading settings...</p>
         </div>
       </div>
     );
@@ -68,167 +104,278 @@ export default function AdminSettingsPage() {
 
   if (!settings) {
     return (
-      <div className="min-h-screen bg-gray-50 p-8">
-        <div className="max-w-4xl mx-auto">
-          <p className="text-red-600">Failed to load settings</p>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 font-semibold">Failed to load settings</p>
+          <button 
+            onClick={fetchSettings}
+            className="mt-4 px-6 py-2 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90"
+          >
+            Retry
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Admin Settings</h1>
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="border-b border-border bg-card sticky top-0 z-10">
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div>
+              <h1 className="font-heading text-3xl font-bold mb-1">System Settings</h1>
+              <p className="text-muted-foreground">Configure payments, loyalty, and rewards</p>
+            </div>
+            <div className="flex gap-3">
+              {editMode ? (
+                <>
+                  <button
+                    onClick={() => {
+                      setEditMode(false);
+                      fetchSettings();
+                    }}
+                    className="px-6 py-3 border border-border rounded-lg font-semibold hover:bg-accent transition"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSaveSettings}
+                    disabled={saving}
+                    className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition disabled:opacity-50"
+                  >
+                    {saving ? "Saving..." : "Save Changes"}
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => setEditMode(true)}
+                  className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition"
+                >
+                  Edit Settings
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      </header>
 
-        <div className="space-y-8">
+      <div className="container mx-auto px-4 py-8">
+        <div className="space-y-8 max-w-4xl">
           {/* Payment Settings */}
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-xl font-semibold mb-4">Payment Settings</h2>
-            <div className="space-y-3">
+          <div className="bg-card p-6 rounded-lg shadow border border-border">
+            <h2 className="text-xl font-semibold mb-4">💳 Payment Settings</h2>
+            <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">JazzCash Number</label>
+                <label className="block text-sm font-semibold mb-2">JazzCash Number</label>
                 <input
                   type="text"
                   value={settings.payment.jazzCashNumber}
-                  disabled
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
+                  onChange={(e) => updateSetting('payment', 'jazzCashNumber', e.target.value)}
+                  disabled={!editMode}
+                  className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-60 disabled:cursor-not-allowed"
+                  placeholder="03XX-XXXXXXX"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Easypaisa Number</label>
+                <label className="block text-sm font-semibold mb-2">Easypaisa Number</label>
                 <input
                   type="text"
                   value={settings.payment.easypaisaNumber}
-                  disabled
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
+                  onChange={(e) => updateSetting('payment', 'easypaisaNumber', e.target.value)}
+                  disabled={!editMode}
+                  className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-60 disabled:cursor-not-allowed"
+                  placeholder="03XX-XXXXXXX"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Bank Name</label>
+                <label className="block text-sm font-semibold mb-2">WhatsApp Number</label>
+                <input
+                  type="text"
+                  value={settings.payment.whatsappNumber}
+                  onChange={(e) => updateSetting('payment', 'whatsappNumber', e.target.value)}
+                  disabled={!editMode}
+                  className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-60 disabled:cursor-not-allowed"
+                  placeholder="+92 XXX XXXXXXX"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold mb-2">Bank Name</label>
                 <input
                   type="text"
                   value={settings.payment.bankName}
-                  disabled
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
+                  onChange={(e) => updateSetting('payment', 'bankName', e.target.value)}
+                  disabled={!editMode}
+                  className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-60 disabled:cursor-not-allowed"
+                  placeholder="Bank Name"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold mb-2">Bank Account Number</label>
+                <input
+                  type="text"
+                  value={settings.payment.bankAccountNumber}
+                  onChange={(e) => updateSetting('payment', 'bankAccountNumber', e.target.value)}
+                  disabled={!editMode}
+                  className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-60 disabled:cursor-not-allowed"
+                  placeholder="XXXX-XXXX-XXXX"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold mb-2">Account Title</label>
+                <input
+                  type="text"
+                  value={settings.payment.bankAccountTitle}
+                  onChange={(e) => updateSetting('payment', 'bankAccountTitle', e.target.value)}
+                  disabled={!editMode}
+                  className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-60 disabled:cursor-not-allowed"
+                  placeholder="Account Holder Name"
                 />
               </div>
             </div>
-            <p className="mt-4 text-sm text-gray-500">
-              Note: Settings are currently managed via environment variables. Update .env file to change.
-            </p>
           </div>
 
           {/* Loyalty Settings */}
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-xl font-semibold mb-4">Loyalty Settings</h2>
-            <div className="space-y-3">
+          <div className="bg-card p-6 rounded-lg shadow border border-border">
+            <h2 className="text-xl font-semibold mb-4">🎁 Loyalty Program</h2>
+            <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Points Per Rs</label>
+                <label className="block text-sm font-semibold mb-2">Points Per Rs. 100</label>
                 <input
                   type="number"
                   value={settings.loyalty.pointsPerCurrencyUnit}
-                  disabled
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
+                  onChange={(e) => updateSetting('loyalty', 'pointsPerCurrencyUnit', parseFloat(e.target.value))}
+                  disabled={!editMode}
+                  className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-60 disabled:cursor-not-allowed"
+                  min="0"
+                  step="1"
                 />
-                <p className="text-xs text-gray-500 mt-1">How many points earned per Rs spent</p>
+                <p className="text-xs text-muted-foreground mt-1">How many points earned per Rs. 100 spent</p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Redemption Rate</label>
+                <label className="block text-sm font-semibold mb-2">Redemption Rate (Rs per point)</label>
                 <input
                   type="number"
                   value={settings.loyalty.redemptionRate}
-                  disabled
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
+                  onChange={(e) => updateSetting('loyalty', 'redemptionRate', parseFloat(e.target.value))}
+                  disabled={!editMode}
+                  className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-60 disabled:cursor-not-allowed"
+                  min="0"
+                  step="0.1"
                 />
-                <p className="text-xs text-gray-500 mt-1">Rs value of 1 point when redeemed</p>
+                <p className="text-xs text-muted-foreground mt-1">Rs value of 1 point when redeemed</p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Google Review Bonus</label>
+                <label className="block text-sm font-semibold mb-2">Google Review Bonus Points</label>
                 <input
                   type="number"
                   value={settings.loyalty.reviewBonus}
-                  disabled
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
+                  onChange={(e) => updateSetting('loyalty', 'reviewBonus', parseInt(e.target.value))}
+                  disabled={!editMode}
+                  className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-60 disabled:cursor-not-allowed"
+                  min="0"
+                  step="10"
                 />
-                <p className="text-xs text-gray-500 mt-1">Points awarded for approved Google reviews</p>
+                <p className="text-xs text-muted-foreground mt-1">Points awarded for approved Google reviews</p>
               </div>
             </div>
           </div>
 
           {/* Birthday Settings */}
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-xl font-semibold mb-4">Birthday Program</h2>
-            <div className="space-y-3">
+          <div className="bg-card p-6 rounded-lg shadow border border-border">
+            <h2 className="text-xl font-semibold mb-4">🎂 Birthday Rewards</h2>
+            <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Discount (%)</label>
+                <label className="block text-sm font-semibold mb-2">Birthday Discount (%)</label>
                 <input
                   type="number"
                   value={settings.birthday.discount}
-                  disabled
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
+                  onChange={(e) => updateSetting('birthday', 'discount', parseInt(e.target.value))}
+                  disabled={!editMode}
+                  className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-60 disabled:cursor-not-allowed"
+                  min="0"
+                  max="100"
+                  step="5"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Validity (days)</label>
+                <label className="block text-sm font-semibold mb-2">Voucher Validity (days)</label>
                 <input
                   type="number"
                   value={settings.birthday.validityDays}
-                  disabled
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
+                  onChange={(e) => updateSetting('birthday', 'validityDays', parseInt(e.target.value))}
+                  disabled={!editMode}
+                  className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-60 disabled:cursor-not-allowed"
+                  min="1"
+                  step="1"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Birthday Message</label>
+                <label className="block text-sm font-semibold mb-2">Birthday Message</label>
                 <textarea
                   value={settings.birthday.message}
-                  disabled
-                  rows={2}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
+                  onChange={(e) => updateSetting('birthday', 'message', e.target.value)}
+                  disabled={!editMode}
+                  rows={3}
+                  className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-60 disabled:cursor-not-allowed"
+                  placeholder="Happy Birthday message..."
                 />
               </div>
             </div>
           </div>
 
           {/* Win-Back Settings */}
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-xl font-semibold mb-4">Win-Back Program</h2>
-            <div className="space-y-3">
+          <div className="bg-card p-6 rounded-lg shadow border border-border">
+            <h2 className="text-xl font-semibold mb-4">🎯 Win-Back Campaign</h2>
+            <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Inactivity Threshold (days)</label>
+                <label className="block text-sm font-semibold mb-2">Inactivity Threshold (days)</label>
                 <input
                   type="number"
                   value={settings.winback.thresholdDays}
-                  disabled
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
+                  onChange={(e) => updateSetting('winback', 'thresholdDays', parseInt(e.target.value))}
+                  disabled={!editMode}
+                  className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-60 disabled:cursor-not-allowed"
+                  min="1"
+                  step="1"
                 />
-                <p className="text-xs text-gray-500 mt-1">Days since last order to trigger win-back</p>
+                <p className="text-xs text-muted-foreground mt-1">Days since last order to trigger win-back</p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Discount (%)</label>
+                <label className="block text-sm font-semibold mb-2">Win-Back Discount (%)</label>
                 <input
                   type="number"
                   value={settings.winback.discount}
-                  disabled
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
+                  onChange={(e) => updateSetting('winback', 'discount', parseInt(e.target.value))}
+                  disabled={!editMode}
+                  className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-60 disabled:cursor-not-allowed"
+                  min="0"
+                  max="100"
+                  step="5"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Validity (days)</label>
+                <label className="block text-sm font-semibold mb-2">Voucher Validity (days)</label>
                 <input
                   type="number"
                   value={settings.winback.validityDays}
-                  disabled
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
+                  onChange={(e) => updateSetting('winback', 'validityDays', parseInt(e.target.value))}
+                  disabled={!editMode}
+                  className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-60 disabled:cursor-not-allowed"
+                  min="1"
+                  step="1"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Win-Back Message</label>
+                <label className="block text-sm font-semibold mb-2">Win-Back Message</label>
                 <textarea
                   value={settings.winback.message}
-                  disabled
-                  rows={2}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
+                  onChange={(e) => updateSetting('winback', 'message', e.target.value)}
+                  disabled={!editMode}
+                  rows={3}
+                  className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-60 disabled:cursor-not-allowed"
+                  placeholder="We miss you message..."
                 />
               </div>
             </div>

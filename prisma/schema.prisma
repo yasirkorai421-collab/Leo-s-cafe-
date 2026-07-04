@@ -421,3 +421,41 @@ model AuditLog {
 
   @@map("audit_log")
 }
+
+
+// ============================================================================
+// SYSTEM SETTINGS
+// ============================================================================
+
+model SystemSettings {
+  id                       String   @id @default(uuid())
+  
+  // Payment Settings
+  jazzCashNumber           String   @default("") @map("jazz_cash_number")
+  easypaisaNumber          String   @default("") @map("easypaisa_number")
+  bankName                 String   @default("") @map("bank_name")
+  bankAccountNumber        String   @default("") @map("bank_account_number")
+  bankAccountTitle         String   @default("") @map("bank_account_title")
+  whatsappNumber           String   @default("") @map("whatsapp_number")
+  
+  // Loyalty Settings
+  loyaltyPointsPerCurrency Float    @default(10) @map("loyalty_points_per_currency")
+  loyaltyRedemptionRate    Float    @default(1) @map("loyalty_redemption_rate")
+  googleReviewBonus        Int      @default(200) @map("google_review_bonus")
+  
+  // Birthday Settings
+  birthdayDiscount         Int      @default(20) @map("birthday_discount")
+  birthdayValidityDays     Int      @default(7) @map("birthday_validity_days")
+  birthdayMessage          String   @default("Happy Birthday! Enjoy your special discount!") @map("birthday_message")
+  
+  // Winback Settings
+  winbackThresholdDays     Int      @default(30) @map("winback_threshold_days")
+  winbackDiscount          Int      @default(15) @map("winback_discount")
+  winbackValidityDays      Int      @default(7) @map("winback_validity_days")
+  winbackMessage           String   @default("We miss you! Come back for a special offer!") @map("winback_message")
+  
+  createdAt                DateTime @default(now()) @map("created_at")
+  updatedAt                DateTime @updatedAt @map("updated_at")
+
+  @@map("system_settings")
+}
