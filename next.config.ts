@@ -25,11 +25,9 @@ const nextConfig: NextConfig = {
       allowedOrigins: ["localhost:3000", "localhost:3001"],
     },
   },
-  // Enable SWC minification for faster builds
-  swcMinify: true,
-  // Enable React compiler optimizations
+  // React strict mode for better error detection
   reactStrictMode: true,
-  // Optimize bundle size
+  // Remove console logs in production
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
   },

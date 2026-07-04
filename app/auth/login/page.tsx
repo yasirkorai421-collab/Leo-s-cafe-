@@ -4,6 +4,7 @@ import { useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { sanitizeEmail } from "@/lib/security";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -15,28 +16,43 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [attemptCount, setAttemptCount] = useState(0);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Rate limiting: Block after 5 failed attempts
+    if (attemptCount >= 5) {
+      setError("Too many failed attempts. Please try again in 15 minutes.");
+      return;
+    }
+    
     setIsLoading(true);
     setError("");
 
     try {
+      // Sanitize email input
+      const sanitizedEmail = sanitizeEmail(email);
+      
       const supabase = createClient();
       const { error: signInError } = await supabase.auth.signInWithPassword({
-        email,
+        email: sanitizedEmail,
         password,
       });
 
       if (signInError) {
+        setAttemptCount(prev => prev + 1);
         setError(signInError.message);
         setIsLoading(false);
         return;
       }
 
+      // Reset attempt count on success
+      setAttemptCount(0);
       router.push(redirectUrl || "/");
       router.refresh();
     } catch (err) {
+      setAttemptCount(prev => prev + 1);
       setError("An unexpected error occurred");
       setIsLoading(false);
     }
