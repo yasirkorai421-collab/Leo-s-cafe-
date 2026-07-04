@@ -38,18 +38,18 @@ function WeddingIcon() {
 const services = [
   {
     icon: <MeetingIcon />,
-    title: "Business Meetings",
-    desc: "Impress clients and colleagues with a premium dining experience tailored to your corporate needs. Private rooms available.",
-  },
-  {
-    icon: <WeddingIcon />,
-    title: "Wedding Party",
-    desc: "Make your special day unforgettable. Our team crafts bespoke menus and décor to match your vision perfectly.",
+    title: "Pizza",
+    desc: "Our signature loaded pizzas in three sizes with toppings you can customize. From Leo's Special to Peri Peri Chicken.",
   },
   {
     icon: <CakeIcon />,
-    title: "Birthday Party",
-    desc: "Celebrate life's milestones in style. Custom cakes, themed menus, and warm hospitality for every age.",
+    title: "Fast Food",
+    desc: "Crispy zinger burgers, grilled sandwiches, chicken shawarma, and a variety of rolls wrapped fresh and hot.",
+  },
+  {
+    icon: <WeddingIcon />,
+    title: "Open Late",
+    desc: "Kitchen runs past midnight most nights. Whether it's lunch or a late-night craving, we're here for you.",
   },
 ];
 
@@ -67,16 +67,16 @@ export default function Home() {
             <div className="w-full lg:w-1/2 flex h-[480px] gap-2">
               <div className="w-1/2 h-full">
                 <img
-                  src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?q=80&w=800&h=1200&fit=crop"
+                  src="https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=800&h=1200&fit=crop"
                   className="w-full h-full object-cover"
-                  alt="Head chef"
+                  alt="Pizza fresh from oven"
                 />
               </div>
               <div className="w-1/2 h-full mt-8">
                 <img
-                  src="https://images.unsplash.com/photo-1556155092-490a1ba16284?q=80&w=800&h=1200&fit=crop"
+                  src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=800&h=1200&fit=crop"
                   className="w-full h-full object-cover"
-                  alt="Kitchen in action"
+                  alt="Delicious burger"
                 />
               </div>
             </div>
@@ -85,21 +85,21 @@ export default function Home() {
             <div className="w-full lg:w-1/2 flex flex-col justify-center">
               <div className="section-heading !text-left !mb-6">
                 <span className="script-accent">About</span>
-                <h2 className="bold-title">Feliciano Restaurant</h2>
+                <h2 className="bold-title">Leo's Café</h2>
               </div>
               <p className="mb-6 leading-relaxed" style={{ color: "var(--color-body-gray)" }}>
-                Nestled in the heart of the city, Feliciano brings together the warmth of home cooking
-                and the craft of fine dining. Every dish is made from locally sourced ingredients,
-                prepared fresh daily by our passionate team of chefs.
+                Located in New Zain Plaza near THQ Hospital, Leo's Café has grown into one of Kot Addu's most-loved fast food spots. 
+                We serve loaded pizzas with generous toppings, zinger burgers with real crunch, and shawarmas wrapped tight and hot.
               </p>
               <p className="mb-8">
-                <strong className="text-black block">Mon – Fri &nbsp;8 AM – 11 PM</strong>
+                <strong className="text-black block">Daily: 12:01 PM – 11:30 PM</strong>
+                <strong className="text-black block text-sm">Friday: 3:00 PM – 11:00 PM</strong>
                 <a
-                  href="tel:+19781234567"
+                  href="tel:+923361171626"
                   className="font-bold block mt-2"
                   style={{ color: "var(--color-accent)", fontSize: "1.75rem" }}
                 >
-                  +1-978-123-4567
+                  +92 336 1171626
                 </a>
               </p>
             </div>

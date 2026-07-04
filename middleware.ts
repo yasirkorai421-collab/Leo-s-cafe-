@@ -2,14 +2,8 @@ import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/utils/supabase/middleware";
 
 const publicRoutes = [
-  /^\/$/,
-  /^\/menu(.*)/,
-  /^\/about$/,
-  /^\/contact$/,
-  /^\/privacy$/,
   /^\/auth\/login$/,
   /^\/auth\/signup$/,
-  /^\/api\/menu(.*)/,
   /^\/api\/webhooks\/(.*)/,
   /^\/api\/dine\/scan(.*)/,
 ];

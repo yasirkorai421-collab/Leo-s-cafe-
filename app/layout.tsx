@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Poppins, Baloo_2, Alex_Brush } from "next/font/google";
 import SiteHeader from "@/components/SiteHeader";
 import Footer from "@/components/Footer";
+import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -26,8 +27,8 @@ const alexBrush = Alex_Brush({
 });
 
 export const metadata: Metadata = {
-  title: "Feliciano Restaurant",
-  description: "Best Restaurant in town. Nutritious & Tasty.",
+  title: "Leo's Café - Kot Addu | Best Pizza & Fast Food",
+  description: "Leo's Café in Kot Addu - Your favorite spot for loaded pizzas, crispy burgers, and fresh shawarmas. Open late, 100% halal.",
 };
 
 export default function RootLayout({
@@ -41,6 +42,7 @@ export default function RootLayout({
       className={`${poppins.variable} ${baloo.variable} ${alexBrush.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans bg-page text-body-gray">
+        <Toaster position="top-right" />
         <SiteHeader />
         {children}
         <Footer />

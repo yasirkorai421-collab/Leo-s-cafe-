@@ -27,7 +27,7 @@ export default function SiteHeader() {
       >
         <div className="container mx-auto px-4 h-16 md:h-20 flex items-center justify-between">
           <Link href="/" className="font-heading font-bold text-white text-2xl" onClick={() => setIsMenuOpen(false)}>
-            Feliciano
+            Leo's Café
           </Link>
 
           {/* Desktop Nav */}
