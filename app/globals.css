@@ -28,11 +28,39 @@
     background-color: var(--bg-page);
     color: var(--color-body-gray);
     font-family: var(--font-poppins), sans-serif;
+    /* Mobile-optimized base font size */
+    font-size: 16px;
+  }
+
+  /* Increase base font size on mobile for better readability */
+  @media (max-width: 640px) {
+    body {
+      font-size: 18px;
+    }
   }
 
   h1, h2, h3, h4, h5, h6 {
     color: var(--color-heading);
     font-family: var(--font-baloo), sans-serif;
+  }
+
+  /* Ensure minimum touch target size */
+  button, a, input, select, textarea {
+    min-height: 48px;
+    min-width: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Input fields should be tall enough for comfortable typing */
+  input, select, textarea {
+    padding: 12px 16px;
+  }
+
+  /* Better line height for readability */
+  p {
+    line-height: 1.7;
   }
 }
 
@@ -65,5 +93,21 @@
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;
+  }
+}
+
+/* Hide scrollbar for horizontal scroll on mobile */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Add padding bottom for mobile bottom navigation */
+@media (max-width: 1024px) {
+  body {
+    padding-bottom: 88px; /* Space for bottom nav */
   }
 }

@@ -357,28 +357,57 @@ export default function MenuPage() {
 
           <div className="flex flex-col md:flex-row gap-8">
 
-            {/* Category Tabs — stacked full-width buttons, no border-radius */}
-            <div className="w-full md:w-1/4 flex-shrink-0 flex flex-col border border-border-light overflow-hidden">
-              {categories.map((cat) => {
-                const isActive = activeTab === cat;
-                return (
-                  <button
-                    key={cat}
-                    id={`menu-tab-${cat.toLowerCase()}`}
-                    onClick={() => setActiveTab(cat)}
-                    className="py-4 px-6 text-center text-lg font-medium transition-colors border-b last:border-b-0"
-                    style={{
-                      background: isActive ? "var(--color-accent)" : "var(--bg-tab-inactive)",
-                      color: isActive ? "#ffffff" : "var(--color-heading)",
-                      fontWeight: isActive ? 700 : 500,
-                      borderColor: "var(--color-border-light)",
-                      borderRadius: 0,
-                    }}
-                  >
-                    {cat}
-                  </button>
-                );
-              })}
+            {/* Category Tabs — horizontal scroll on mobile, stacked on desktop */}
+            <div className="w-full md:w-1/4 flex-shrink-0">
+              {/* Mobile: Horizontal scroll */}
+              <div className="md:hidden overflow-x-auto pb-2 mb-6 flex gap-2 snap-x snap-mandatory scrollbar-hide">
+                {categories.map((cat) => {
+                  const isActive = activeTab === cat;
+                  return (
+                    <button
+                      key={cat}
+                      id={`menu-tab-${cat.toLowerCase()}`}
+                      onClick={() => setActiveTab(cat)}
+                      className="px-6 py-3 text-base font-medium transition-all whitespace-nowrap snap-start flex-shrink-0"
+                      style={{
+                        background: isActive ? "var(--color-accent)" : "var(--bg-tab-inactive)",
+                        color: isActive ? "#ffffff" : "var(--color-heading)",
+                        fontWeight: isActive ? 700 : 500,
+                        borderRadius: 0,
+                        minHeight: '48px',
+                        minWidth: 'fit-content',
+                      }}
+                    >
+                      {cat}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Desktop: Vertical stack */}
+              <div className="hidden md:flex flex-col border border-border-light overflow-hidden">
+                {categories.map((cat) => {
+                  const isActive = activeTab === cat;
+                  return (
+                    <button
+                      key={cat}
+                      id={`menu-tab-${cat.toLowerCase()}-desktop`}
+                      onClick={() => setActiveTab(cat)}
+                      className="py-4 px-6 text-center text-lg font-medium transition-colors border-b last:border-b-0"
+                      style={{
+                        background: isActive ? "var(--color-accent)" : "var(--bg-tab-inactive)",
+                        color: isActive ? "#ffffff" : "var(--color-heading)",
+                        fontWeight: isActive ? 700 : 500,
+                        borderColor: "var(--color-border-light)",
+                        borderRadius: 0,
+                        minHeight: '56px',
+                      }}
+                    >
+                      {cat}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             {/* Menu Items Grid */}
@@ -391,55 +420,55 @@ export default function MenuPage() {
                 </div>
               )}
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6">
                 {items.map((item, idx) => (
                   <article
                     key={idx}
-                    className="flex items-center gap-4 border p-4 transition-shadow hover:shadow-md relative"
+                    className="flex flex-col sm:flex-row items-start sm:items-center gap-4 border p-4 sm:p-6 transition-shadow hover:shadow-lg relative"
                     style={{ borderColor: "var(--color-border-light)" }}
                   >
                     {item.badge && (
-                      <div className="absolute top-2 right-2 bg-accent text-white text-xs px-2 py-1 font-bold uppercase">
+                      <div className="absolute top-3 right-3 bg-accent text-white text-xs px-3 py-1 font-bold uppercase">
                         {item.badge}
                       </div>
                     )}
 
                     {/* Food photo */}
-                    <div className="w-20 h-20 flex-shrink-0 overflow-hidden rounded-full relative">
+                    <div className="w-24 h-24 sm:w-28 sm:h-28 flex-shrink-0 overflow-hidden rounded-full relative mx-auto sm:mx-0">
                       <Image
                         src={item.img}
                         alt={item.name}
                         fill
-                        sizes="80px"
+                        sizes="(max-width: 640px) 96px, 112px"
                         className="object-cover"
                         loading="lazy"
                       />
                     </div>
 
                     {/* Details */}
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 w-full">
                       <h3
-                        className="font-heading font-bold text-lg leading-tight mb-1"
+                        className="font-heading font-bold text-xl leading-tight mb-2"
                         style={{ color: "var(--color-heading)" }}
                       >
                         {item.name}
                       </h3>
-                      <p className="text-sm mb-2" style={{ color: "var(--color-label-gray)" }}>
+                      <p className="text-base mb-4" style={{ color: "var(--color-label-gray)" }}>
                         {item.description}
                       </p>
 
                       {/* Pricing & Add to Cart */}
-                      <div className="flex items-center justify-between mt-3">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                         <div>
                           {isPizzaTab && item.priceSmall ? (
-                            <div className="flex gap-2 text-xs font-bold">
-                              <span style={{ color: "#666" }}>{item.priceSmall}</span>
-                              <span style={{ color: "#d65813" }}>{item.priceMedium}</span>
-                              <span style={{ color: "#d62828" }}>{item.priceLarge}</span>
+                            <div className="flex gap-3 text-sm font-bold">
+                              <span style={{ color: "#666" }}>S: {item.priceSmall}</span>
+                              <span style={{ color: "#d65813" }}>M: {item.priceMedium}</span>
+                              <span style={{ color: "#d62828" }}>L: {item.priceLarge}</span>
                             </div>
                           ) : (
                             <span
-                              className="font-bold text-lg"
+                              className="font-bold text-xl"
                               style={{ color: "var(--color-accent)" }}
                             >
                               {item.price}
@@ -449,15 +478,16 @@ export default function MenuPage() {
                         
                         <button
                           onClick={() => handleAddToCart(item)}
-                          className="flex items-center gap-1 px-4 py-2 rounded-lg font-semibold text-white text-sm transition-all hover:shadow-md"
+                          className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-white text-base transition-all hover:shadow-lg active:scale-95"
                           style={{ 
                             background: 'linear-gradient(135deg, #ff6b35 0%, #f7931e 100%)',
+                            minHeight: '52px',
                           }}
                         >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/>
                           </svg>
-                          <span>Add</span>
+                          <span>Add to Cart</span>
                         </button>
                       </div>
                     </div>

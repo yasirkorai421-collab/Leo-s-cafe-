@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Poppins, Baloo_2, Alex_Brush } from "next/font/google";
 import SiteHeader from "@/components/SiteHeader";
 import Footer from "@/components/Footer";
+import FloatingCartButton from "@/components/FloatingCartButton";
+import FloatingCallButton from "@/components/FloatingCallButton";
+import BottomNavBar from "@/components/BottomNavBar";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
@@ -46,6 +49,11 @@ export default function RootLayout({
         <SiteHeader />
         {children}
         <Footer />
+        
+        {/* Mobile Enhancements */}
+        <FloatingCartButton />
+        <FloatingCallButton />
+        <BottomNavBar />
       </body>
     </html>
   );
