@@ -3,11 +3,39 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCart } from "@/store/cart";
+import { createClient } from "@/utils/supabase/client";
+import { useState, useEffect } from "react";
 
 export default function BottomNavBar() {
   const pathname = usePathname();
   const { items } = useCart();
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const supabase = createClient();
+
+  // Check authentication status
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setIsAuthenticated(!!user);
+    };
+    
+    checkAuth();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session?.user);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [supabase.auth]);
+
+  // Don't show bottom nav if not authenticated
+  if (!isAuthenticated) {
+    return null;
+  }
 
   const navItems = [
     {

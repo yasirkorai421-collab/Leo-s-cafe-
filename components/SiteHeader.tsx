@@ -2,11 +2,35 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import NavDrawer from "./NavDrawer";
+import { createClient } from "@/utils/supabase/client";
 
 export default function SiteHeader() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const pathname = usePathname();
+  const supabase = createClient();
+
+  // Check authentication status
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setIsAuthenticated(!!user);
+    };
+    
+    checkAuth();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session?.user);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [supabase.auth]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -15,6 +39,13 @@ export default function SiteHeader() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Don't show header on auth pages if not authenticated
+  const isAuthPage = pathname?.startsWith('/auth/');
+  
+  if (!isAuthenticated && !isAuthPage) {
+    return null; // Hide header when not logged in (except on auth pages)
+  }
 
   return (
     <>
