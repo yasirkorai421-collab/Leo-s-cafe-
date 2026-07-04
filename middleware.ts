@@ -4,6 +4,7 @@ import { updateSession } from "@/utils/supabase/middleware";
 const publicRoutes = [
   /^\/auth\/login$/,
   /^\/auth\/signup$/,
+  /^\/auth\/callback$/,
   /^\/api\/webhooks\/(.*)/,
   /^\/api\/dine\/scan(.*)/,
 ];
@@ -43,7 +44,7 @@ export async function middleware(request: NextRequest) {
   // Not authenticated - redirect to login
   if (!user) {
     const loginUrl = new URL("/auth/login", request.url);
-    loginUrl.searchParams.set("redirect", request.url);
+    loginUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
@@ -57,7 +58,7 @@ export async function middleware(request: NextRequest) {
 
   // Auth routes - redirect if already logged in
   if (isMatch(pathname, authRoutes) && user) {
-    return NextResponse.redirect(new URL("/menu", request.url));
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   return supabaseResponse;
