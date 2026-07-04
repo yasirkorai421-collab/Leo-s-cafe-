@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
 const testimonials = [
   {
@@ -32,15 +33,18 @@ export default function TestimonyCarousel() {
   return (
     <div className="max-w-2xl mx-auto text-center mt-12 px-4">
       {/* Avatar */}
-      <div className="relative inline-block mb-8">
-        <img
+      <div className="relative inline-block mb-8 w-24 h-24">
+        <Image
           src={testimonials[current].img}
           alt={testimonials[current].name}
-          className="w-24 h-24 rounded-full object-cover mx-auto transition-opacity duration-300"
+          fill
+          sizes="96px"
+          className="rounded-full object-cover transition-opacity duration-300"
+          loading="lazy"
         />
         {/* Quote badge — explicitly circular per spec */}
         <div
-          className="absolute bottom-0 right-0 w-8 h-8 rounded-full flex items-center justify-center text-white text-lg font-bold leading-none"
+          className="absolute bottom-0 right-0 w-8 h-8 rounded-full flex items-center justify-center text-white text-lg font-bold leading-none z-10"
           style={{ background: "var(--color-accent)" }}
           aria-hidden="true"
         >

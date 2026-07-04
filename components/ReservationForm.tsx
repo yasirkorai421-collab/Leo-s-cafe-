@@ -1,20 +1,26 @@
 'use client';
 
+import Image from "next/image";
+
 export default function ReservationForm() {
   return (
     <>
       {/* Dark photo banner with decorative 3-part heading */}
       <section className="relative py-20 overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <img
-            src="https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?q=80&w=2000&h=600&fit=crop"
+          <Image
+            src="https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?q=80&w=1920&h=600&fit=crop&auto=format"
             alt="Book a Table"
-            className="w-full h-full object-cover"
+            fill
+            sizes="100vw"
+            quality={85}
+            className="object-cover"
+            loading="lazy"
           />
-          <div className="absolute inset-0 bg-black/55" />
+          <div className="absolute inset-0 bg-black/55 z-10" />
         </div>
 
-        <div className="relative z-10 container mx-auto px-4 text-center">
+        <div className="relative z-20 container mx-auto px-4 text-center">
           {/* "Book a" — script, top-left offset */}
           <span
             className="font-script block text-accent"

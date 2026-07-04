@@ -3,6 +3,7 @@ import StatsCounter from "@/components/StatsCounter";
 import ChefCarousel from "@/components/ChefCarousel";
 import TestimonyCarousel from "@/components/TestimonyCarousel";
 import ReservationForm from "@/components/ReservationForm";
+import Image from "next/image";
 
 function CakeIcon() {
   return (
@@ -58,15 +59,19 @@ export default function AboutPage() {
       {/* ── Page Hero Banner ── */}
       <section className="relative h-[400px] flex flex-col items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <img
-            src="https://images.unsplash.com/photo-1414235077428-338988a2e8c0?q=80&w=2070&h=1380&fit=crop"
+          <Image
+            src="https://images.unsplash.com/photo-1414235077428-338988a2e8c0?q=80&w=1920&fit=crop&auto=format"
             alt="About Leo's Café"
-            className="w-full h-full object-cover"
+            fill
+            priority
+            quality={85}
+            sizes="100vw"
+            className="object-cover"
           />
-          <div className="absolute inset-0 bg-black/60" />
+          <div className="absolute inset-0 bg-black/60 z-10" />
         </div>
 
-        <div className="relative z-10 text-center px-4 mt-16">
+        <div className="relative z-20 text-center px-4 mt-16">
           <h1
             className="font-heading font-bold text-white uppercase mb-2"
             style={{ fontSize: "clamp(2rem, 5vw, 2.5rem)", letterSpacing: "2px" }}
@@ -83,18 +88,24 @@ export default function AboutPage() {
           <div className="flex flex-col lg:flex-row items-center lg:items-stretch gap-12">
             {/* Photo collage */}
             <div className="w-full lg:w-1/2 flex h-[480px] gap-2">
-              <div className="w-1/2 h-full">
-                <img
-                  src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?q=80&w=800&h=1200&fit=crop"
-                  className="w-full h-full object-cover"
+              <div className="w-1/2 h-full relative">
+                <Image
+                  src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?q=80&w=800&h=1200&fit=crop&auto=format"
+                  fill
+                  sizes="(max-width: 1024px) 50vw, 25vw"
+                  className="object-cover"
                   alt="Head chef"
+                  loading="lazy"
                 />
               </div>
-              <div className="w-1/2 h-full mt-8">
-                <img
-                  src="https://images.unsplash.com/photo-1556155092-490a1ba16284?q=80&w=800&h=1200&fit=crop"
-                  className="w-full h-full object-cover"
+              <div className="w-1/2 h-full mt-8 relative">
+                <Image
+                  src="https://images.unsplash.com/photo-1556155092-490a1ba16284?q=80&w=800&h=1200&fit=crop&auto=format"
+                  fill
+                  sizes="(max-width: 1024px) 50vw, 25vw"
+                  className="object-cover"
                   alt="Kitchen in action"
+                  loading="lazy"
                 />
               </div>
             </div>

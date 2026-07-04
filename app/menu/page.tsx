@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Breadcrumb from "@/components/Breadcrumb";
 import { useCart } from "@/store/cart";
 import { toast } from "react-hot-toast";
@@ -321,15 +322,19 @@ export default function MenuPage() {
       {/* ── Page Hero Banner ── */}
       <section className="relative h-[400px] flex flex-col items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <img
-            src="https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=2070&h=1380&fit=crop"
+          <Image
+            src="https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=1920&fit=crop&auto=format"
             alt="Menu hero"
-            className="w-full h-full object-cover"
+            fill
+            priority
+            quality={85}
+            sizes="100vw"
+            className="object-cover"
           />
-          <div className="absolute inset-0 bg-black/60" />
+          <div className="absolute inset-0 bg-black/60 z-10" />
         </div>
 
-        <div className="relative z-10 text-center px-4 mt-16">
+        <div className="relative z-20 text-center px-4 mt-16">
           <h1
             className="font-heading font-bold text-white uppercase mb-2"
             style={{ fontSize: "clamp(2rem, 5vw, 2.5rem)", letterSpacing: "2px" }}
@@ -400,11 +405,14 @@ export default function MenuPage() {
                     )}
 
                     {/* Food photo */}
-                    <div className="w-20 h-20 flex-shrink-0 overflow-hidden rounded-full">
-                      <img
+                    <div className="w-20 h-20 flex-shrink-0 overflow-hidden rounded-full relative">
+                      <Image
                         src={item.img}
                         alt={item.name}
-                        className="w-full h-full object-cover"
+                        fill
+                        sizes="80px"
+                        className="object-cover"
+                        loading="lazy"
                       />
                     </div>
 
@@ -509,11 +517,13 @@ export default function MenuPage() {
               </button>
             </div>
 
-            <div className="mb-6">
-              <img
+            <div className="mb-6 relative h-48 rounded-lg overflow-hidden">
+              <Image
                 src={selectedItem.img}
                 alt={selectedItem.name}
-                className="w-full h-48 object-cover rounded-lg"
+                fill
+                sizes="(max-width: 768px) 100vw, 400px"
+                className="object-cover"
               />
             </div>
 

@@ -1,23 +1,24 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 
 const slides = [
   {
     id: 1,
-    img: "https://images.unsplash.com/photo-1414235077428-338988a2e8c0?q=80&w=2070&fit=crop",
+    img: "https://images.unsplash.com/photo-1414235077428-338988a2e8c0?q=80&w=1920&fit=crop&auto=format",
     script: "Leo's Café",
     subtitle: "KOT ADDU'S FAVORITE",
   },
   {
     id: 2,
-    img: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=2070&fit=crop",
+    img: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1920&fit=crop&auto=format",
     script: "Leo's Café",
     subtitle: "PIZZA & FAST FOOD",
   },
   {
     id: 3,
-    img: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=2070&fit=crop",
+    img: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1920&fit=crop&auto=format",
     script: "Leo's Café",
     subtitle: "OPEN LATE EVERY DAY",
   },
@@ -54,17 +55,21 @@ export default function HeroCarousel() {
           className="absolute inset-0 transition-opacity duration-1000"
           style={{ opacity: i === current ? 1 : 0, zIndex: i === current ? 1 : 0 }}
         >
-          <img
+          <Image
             src={slide.img}
             alt={slide.subtitle}
-            className="w-full h-full object-cover"
+            fill
+            priority={i === 0}
+            quality={85}
+            sizes="100vw"
+            className="object-cover"
           />
-          <div className="absolute inset-0 bg-black/50" />
+          <div className="absolute inset-0 bg-black/50 z-10" />
         </div>
       ))}
 
       {/* Content */}
-      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center px-4 mt-16">
+      <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-4 mt-16">
         <span
           className="font-script text-accent block"
           style={{ fontSize: "clamp(2.5rem, 6vw, 4rem)", lineHeight: 1.1 }}
@@ -83,7 +88,7 @@ export default function HeroCarousel() {
       <button
         onClick={() => { prev(); setPaused(true); }}
         aria-label="Previous slide"
-        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 text-white/70 hover:text-white transition-colors text-4xl font-thin select-none"
+        className="absolute left-4 top-1/2 -translate-y-1/2 z-30 text-white/70 hover:text-white transition-colors text-4xl font-thin select-none"
       >
         ‹
       </button>
@@ -92,7 +97,7 @@ export default function HeroCarousel() {
       <button
         onClick={() => { next(); setPaused(true); }}
         aria-label="Next slide"
-        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 text-white/70 hover:text-white transition-colors text-4xl font-thin select-none"
+        className="absolute right-4 top-1/2 -translate-y-1/2 z-30 text-white/70 hover:text-white transition-colors text-4xl font-thin select-none"
       >
         ›
       </button>

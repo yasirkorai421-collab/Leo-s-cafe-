@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Image from "next/image";
 
 const TwitterIcon = () => (
   <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24" aria-hidden="true">
@@ -49,11 +50,14 @@ const chefs = [
 function ChefCard({ chef }: { chef: typeof chefs[0] }) {
   return (
     <div className="flex-shrink-0 w-full md:w-auto">
-      <div className="aspect-[4/5] overflow-hidden mb-5">
-        <img
+      <div className="aspect-[4/5] overflow-hidden mb-5 relative">
+        <Image
           src={chef.img}
           alt={chef.name}
-          className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          className="object-cover transition-transform duration-500 hover:scale-105"
+          loading="lazy"
         />
       </div>
       <h3 className="font-heading font-bold text-black text-xl mb-1">{chef.name}</h3>

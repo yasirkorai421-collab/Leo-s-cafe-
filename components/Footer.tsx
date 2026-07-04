@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function Footer() {
   return (
     <footer className="bg-dark-panel text-body-gray py-16">
@@ -43,10 +45,13 @@ export default function Footer() {
           <div className="grid grid-cols-3 gap-1">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div key={i} className="aspect-square bg-gray-800 relative overflow-hidden">
-                <img 
-                  src={`https://images.unsplash.com/photo-1544148103-0773bf10d330?q=80&w=200&h=200&fit=crop`} 
-                  alt="Instagram feed" 
-                  className="w-full h-full object-cover"
+                <Image
+                  src={`https://images.unsplash.com/photo-1544148103-0773bf10d330?q=80&w=200&h=200&fit=crop&auto=format`}
+                  alt="Instagram feed"
+                  fill
+                  sizes="100px"
+                  className="object-cover"
+                  loading="lazy"
                 />
               </div>
             ))}

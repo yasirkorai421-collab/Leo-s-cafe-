@@ -3,6 +3,7 @@ import StatsCounter from "@/components/StatsCounter";
 import ChefCarousel from "@/components/ChefCarousel";
 import TestimonyCarousel from "@/components/TestimonyCarousel";
 import ReservationForm from "@/components/ReservationForm";
+import Image from "next/image";
 
 // ── SVG service icons (outline / thin-line style) ──────────────────────────
 function CakeIcon() {
@@ -65,18 +66,24 @@ export default function Home() {
           <div className="flex flex-col lg:flex-row items-center lg:items-stretch gap-12">
             {/* Photo collage */}
             <div className="w-full lg:w-1/2 flex h-[480px] gap-2">
-              <div className="w-1/2 h-full">
-                <img
-                  src="https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=800&h=1200&fit=crop"
-                  className="w-full h-full object-cover"
+              <div className="w-1/2 h-full relative">
+                <Image
+                  src="https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=800&h=1200&fit=crop&auto=format"
+                  fill
+                  sizes="(max-width: 1024px) 50vw, 25vw"
+                  className="object-cover"
                   alt="Pizza fresh from oven"
+                  loading="lazy"
                 />
               </div>
-              <div className="w-1/2 h-full mt-8">
-                <img
-                  src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=800&h=1200&fit=crop"
-                  className="w-full h-full object-cover"
+              <div className="w-1/2 h-full mt-8 relative">
+                <Image
+                  src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=800&h=1200&fit=crop&auto=format"
+                  fill
+                  sizes="(max-width: 1024px) 50vw, 25vw"
+                  className="object-cover"
                   alt="Delicious burger"
+                  loading="lazy"
                 />
               </div>
             </div>
