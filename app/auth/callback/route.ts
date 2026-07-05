@@ -12,14 +12,14 @@ export async function GET(request: Request) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error && data.user) {
-      // Create user in database if doesn't exist (OAuth users)
+      // Create user in database if doesn't exist
       try {
         const existingUser = await prisma.user.findUnique({
           where: { clerkId: data.user.id },
         });
 
         if (!existingUser) {
-          // Extract user details from OAuth providers
+          // Extract user details from metadata
           const name = data.user.user_metadata?.full_name || 
                       data.user.user_metadata?.name || 
                       data.user.email?.split('@')[0] || 
@@ -27,7 +27,9 @@ export async function GET(request: Request) {
           
           const phone = data.user.user_metadata?.phone || 
                        data.user.phone || 
-                       `oauth_${data.user.id.slice(0, 8)}`;
+                       '';
+
+          const birthday = data.user.user_metadata?.birthday || null;
 
           await prisma.user.create({
             data: {
@@ -35,12 +37,13 @@ export async function GET(request: Request) {
               name,
               phone,
               email: data.user.email,
+              birthday: birthday ? new Date(birthday) : null,
               role: 'user',
             },
           });
         }
       } catch (dbError) {
-        console.error('Failed to sync OAuth user to database:', dbError);
+        console.error('Failed to sync user to database:', dbError);
         // Continue anyway - user can still use the app
       }
     }

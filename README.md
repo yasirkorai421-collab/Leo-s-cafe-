@@ -6,14 +6,17 @@ A full-featured online food ordering platform with delivery, dine-in QR ordering
 
 ### Customer Features
 - 🍕 **Menu Browsing** - Browse categories, search items, view customizations
-- 🛒 **Cart & Checkout** - Add items, manage cart, place orders
+- 🛒 **Shopping Cart** - Full cart management with edit, remove, and quantity controls
+- 💳 **Checkout** - Streamlined checkout with order confirmation
 - 📱 **WhatsApp Payment** - Screenshot-based payment with JazzCash/Easypaisa/Bank
 - 📦 **Order Tracking** - Real-time order status updates
+- 📋 **Order History** - View all your past orders
 - 🎯 **Dine-In QR Ordering** - Scan table QR, order without waiting
 - ⭐ **Favorites** - Save favorite menu items
 - 🎁 **Loyalty Rewards** - Earn points, redeem vouchers, birthday rewards
 - 🎂 **Birthday Program** - Automatic birthday vouchers
 - 💝 **Win-Back Offers** - Re-engagement discounts for inactive customers
+- 📱 **Mobile OTP Verification** - Secure phone number verification
 
 ### Admin Features
 - 📊 **Analytics Dashboard** - Revenue, orders, top items
@@ -32,7 +35,7 @@ A full-featured online food ordering platform with delivery, dine-in QR ordering
 - **Styling**: Tailwind CSS 4
 - **Database**: PostgreSQL (via Supabase)
 - **ORM**: Prisma 7
-- **Auth**: Clerk (Phone OTP + Google OAuth)
+- **Auth**: Supabase Authentication with phone OTP verification
 - **Uploads**: Cloudinary
 - **Animation**: Framer Motion
 - **State**: Zustand (cart), TanStack Query
@@ -45,10 +48,20 @@ Copy `.env.example` to `.env.local` and fill in the values:
 ```bash
 # Database
 DATABASE_URL="postgresql://..."
+DIRECT_URL="postgresql://..."
 
-# Clerk Auth
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
-CLERK_SECRET_KEY=
+# Supabase Auth
+NEXT_PUBLIC_SUPABASE_URL=https://...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...
+
+# SMS OTP
+MSG91_API_KEY=your_msg91_api_key
+MSG91_SENDER_ID=LEOCAFE
+TWILIO_ACCOUNT_SID=your_twilio_account_sid
+TWILIO_AUTH_TOKEN=your_twilio_auth_token
+TWILIO_PHONE_NUMBER=+1234567890
+TWILIO_WHATSAPP_NUMBER=whatsapp:+14155238886
 
 # Cloudinary
 NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=
@@ -56,20 +69,18 @@ CLOUDINARY_API_KEY=
 CLOUDINARY_API_SECRET=
 
 # Payment Settings
-JAZZCASH_NUMBER=
-EASYPAISA_NUMBER=
-BANK_NAME=
-BANK_ACCOUNT_NUMBER=
-BANK_ACCOUNT_TITLE=
-WHATSAPP_NUMBER=
+PAYMENT_JAZZCASH_NUMBER=
+PAYMENT_EASYPAISA_NUMBER=
+PAYMENT_BANK_NAME=
+PAYMENT_BANK_ACCOUNT=
+PAYMENT_BANK_IBAN=
+PAYMENT_WHATSAPP_NUMBER=
 
 # Security
-QR_TOKEN_SECRET= # Generate with: openssl rand -base64 32
-UPLOAD_SECRET=
+QR_SECRET= # Generate with: openssl rand -base64 32
 CRON_SECRET=
 
-# Optional: Email, Redis
-RESEND_API_KEY=
+# Redis (optional but recommended)
 UPSTASH_REDIS_REST_URL=
 UPSTASH_REDIS_REST_TOKEN=
 ```
@@ -108,6 +119,10 @@ UPSTASH_REDIS_REST_TOKEN=
    npm run dev
    ```
 
+7. **Configure OTP delivery**
+   - Add `MSG91_API_KEY` and `MSG91_SENDER_ID` (or Twilio credentials) to `.env.local`
+   - Restart the dev server after changing environment variables
+
 7. **Access the application**
    - Open [http://localhost:3000](http://localhost:3000)
 
@@ -135,10 +150,9 @@ UPSTASH_REDIS_REST_TOKEN=
    - Update `DATABASE_URL` in Vercel environment variables
    - Run migrations: `npx prisma db push`
 
-6. **Set up Clerk**
-   - Create Clerk application
-   - Add your Vercel domain to allowed origins
-   - Update Clerk env variables in Vercel
+6. **Set up OTP delivery**
+   - Add the MSG91 or Twilio credentials in Vercel environment variables
+   - Make sure your sender ID is approved for the provider you use
 
 7. **Set up Cloudinary**
    - Create Cloudinary account
@@ -206,14 +220,33 @@ leos-cafe-app/
 
 ## Admin Access
 
-To make a user an admin:
+### Making a User Admin
 
-1. Sign up through the app
-2. Get your Clerk user ID from Clerk dashboard
-3. Update the user in database:
-   ```sql
-   UPDATE users SET role = 'admin' WHERE clerk_id = 'your_clerk_id';
-   ```
+#### Method 1: Using Supabase Dashboard (Recommended)
+
+1. Go to your Supabase project dashboard
+2. Navigate to **Table Editor** → **users** table  
+3. Find the user by email or phone
+4. Edit the `role` field and change from `user` to `admin`
+5. Save changes
+
+#### Method 2: Using SQL Query
+
+```sql
+-- Find your user ID first
+SELECT id, name, email FROM users WHERE email = 'your-email@example.com';
+
+-- Update to admin role
+UPDATE users SET role = 'admin' WHERE id = 'your-user-uuid';
+```
+
+#### Method 3: Using Admin Creation Script
+
+```bash
+npm run admin:create
+```
+
+Follow the prompts to create a new admin user.
 
 ## Cron Jobs
 

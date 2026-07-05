@@ -35,11 +35,28 @@ export default async function TrackOrderPage({
     );
   }
 
+  // Get user from database using Supabase auth ID
+  const user = await prisma.user.findUnique({
+    where: { clerkId: userId },
+    select: { id: true },
+  });
+
+  if (!user) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-2">User not found</h1>
+          <p className="text-muted-foreground">Please complete your profile</p>
+        </div>
+      </div>
+    );
+  }
+
   // Fetch order with ownership check
   const order = await prisma.order.findFirst({
     where: {
       id,
-      userId,
+      userId: user.id,
     },
     include: {
       orderItems: {
@@ -56,7 +73,8 @@ export default async function TrackOrderPage({
 
   const statusSteps = [
     { key: "pending_payment", label: "Pending Payment" },
-    { key: "payment_submitted", label: "Payment Submitted" },
+    { key: "payment_cod", label: "Cash on Delivery" },
+    { key: "payment_whatsapp", label: "Payment Proof Uploaded" },
     { key: "confirmed", label: "Confirmed" },
     { key: "preparing", label: "Preparing" },
     { key: "ready", label: "Ready" },

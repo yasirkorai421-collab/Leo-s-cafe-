@@ -68,7 +68,7 @@ export async function POST(request: Request) {
       data: {
         userId: user.userId,
         status: "pending_payment",
-        paymentStatus: "awaiting_screenshot",
+        paymentStatus: "pending",
         total,
         deliveryAddress,
         orderItems: {

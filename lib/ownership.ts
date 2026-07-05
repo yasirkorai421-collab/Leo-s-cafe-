@@ -39,7 +39,7 @@ export async function checkOrderOwnership(
 
   // Get user from database to check role
   const user = await prisma.user.findUnique({
-    where: { id: userId },
+    where: { clerkId: userId },
     select: { id: true, role: true },
   });
 
@@ -92,7 +92,7 @@ export async function checkUserDataOwnership(
   const userId = authUser.id;
 
   const user = await prisma.user.findUnique({
-    where: { id: userId },
+    where: { clerkId: userId },
     select: { id: true, role: true },
   });
 
@@ -137,7 +137,7 @@ export async function getCurrentUser(): Promise<{
   const userId = authUser.id;
 
   const user = await prisma.user.findUnique({
-    where: { id: userId },
+    where: { clerkId: userId },
     select: { id: true, role: true },
   });
 

@@ -23,11 +23,12 @@ enum UserRole {
 
 model User {
   id              String    @id @default(uuid())
-  clerkId         String    @unique @map("clerk_id") // Clerk's user_xxx ID - links Clerk auth to our DB
+  clerkId         String    @unique @map("clerk_id") // Supabase auth user ID - links Supabase auth to our DB
   name            String
   phone           String    @unique
   email           String?
   role            UserRole  @default(user)
+  phoneVerifiedAt DateTime? @map("phone_verified_at")
   birthday        DateTime? // For birthday rewards & notifications
   birthdayNotificationSent DateTime? @map("birthday_notification_sent") // Track if notification sent this year
   googleReviewSubmitted Boolean @default(false) @map("google_review_submitted") // Track if user submitted Google review
@@ -51,6 +52,18 @@ model User {
   auditLogs           AuditLog[]
 
   @@map("users")
+}
+
+model OtpChallenge {
+  id           String    @id @default(uuid())
+  phone        String    @unique
+  otpHash      String    @map("otp_hash")
+  expiresAt    DateTime  @map("expires_at")
+  attemptCount Int       @default(0) @map("attempt_count")
+  lockUntil    DateTime? @map("lock_until")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  @@map("otp_challenges")
 }
 
 // ============================================================================

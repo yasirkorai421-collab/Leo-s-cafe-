@@ -17,9 +17,11 @@ export async function POST(req: Request) {
       await prisma.user.create({
         data: {
           id: user.id, // Supabase UUID
+          clerkId: user.id, // Map Supabase auth ID to clerkId field (for compatibility)
           email: user.email,
+          phone: `supa_${user.id.substring(0, 8)}`, // Generate a dummy unique phone
           name: user.raw_user_meta_data?.full_name || "New User",
-          role: "customer", // Default role
+          role: "user", // Default role must be 'user' not 'customer'
         },
       });
       

@@ -5,6 +5,11 @@ const publicRoutes = [
   /^\/auth\/login$/,
   /^\/auth\/signup$/,
   /^\/auth\/callback$/,
+  /^\/api\/auth\/send-otp$/,
+  /^\/api\/auth\/verify-otp$/,
+  /^\/api\/otp\/send$/,
+  /^\/api\/otp\/verify$/,
+  /^\/api\/test-otp$/,
   /^\/api\/webhooks\/(.*)/,
   /^\/api\/dine\/scan(.*)/,
 ];
