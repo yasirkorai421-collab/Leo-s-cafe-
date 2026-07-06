@@ -46,7 +46,7 @@ export async function seedAdminUser() {
       return false;
     }
 
-    const existingAdmin = existingUsers?.users.find((u) => u.email === adminEmail);
+    const existingAdmin = existingUsers?.users.find((u: any) => u.email === adminEmail || u.phone === adminPhone);
 
     let supabaseUserId: string;
 

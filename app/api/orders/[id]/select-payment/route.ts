@@ -23,8 +23,8 @@ export async function POST(
     const authResult = await checkOrderOwnership(id);
     if (!authResult.authorized) {
       return NextResponse.json(
-        { error: authResult.reason === "unauthenticated" ? "Unauthorized" : "Order not found" },
-        { status: authResult.reason === "unauthenticated" ? 401 : 404 }
+        { error: "Unauthorized" },
+        { status: 401 }
       );
     }
 

@@ -54,12 +54,12 @@ export async function GET(request: Request) {
             email: true,
           },
         },
-        items: {
+        orderItems: {
           include: {
-            menuItem: {
+            item: {
               select: {
                 name: true,
-                image: true,
+                imageUrl: true,
               },
             },
           },
@@ -74,7 +74,7 @@ export async function GET(request: Request) {
     // Calculate statistics
     const stats = {
       total: orders.length,
-      pending: orders.filter((o) => o.status === "pending").length,
+      pending: orders.filter((o) => o.status === "pending_payment").length,
       pickedUp: orders.filter((o) => o.status === "picked_up").length,
       outForDelivery: orders.filter((o) => o.status === "out_for_delivery").length,
       delivered: orders.filter((o) => o.status === "delivered").length,

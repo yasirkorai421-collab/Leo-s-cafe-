@@ -12,10 +12,12 @@ const updateStatusSchema = z.object({
   status: z.enum([
     "pending_payment",
     "payment_cod",
-    "payment_whatsapp",
+    "payment_online",
     "confirmed",
     "preparing",
     "ready",
+    "picked_up",
+    "out_for_delivery",
     "delivered",
     "cancelled",
   ]),

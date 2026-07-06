@@ -22,12 +22,6 @@ export const prisma =
       process.env.NODE_ENV === "development"
         ? ["query", "error", "warn"]
         : ["error"],
-    // Connection pool settings for scalability
-    datasources: {
-      db: {
-        url: connectionString,
-      },
-    },
   });
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
@@ -118,7 +112,7 @@ export const queryCache = new CachedQuery();
 export async function batchQueries<T extends readonly unknown[]>(
   queries: readonly [...{ [K in keyof T]: () => Promise<T[K]> }]
 ): Promise<T> {
-  return Promise.all(queries.map((query) => query())) as Promise<T>;
+  return Promise.all(queries.map((query) => query())) as unknown as Promise<T>;
 }
 
 /**

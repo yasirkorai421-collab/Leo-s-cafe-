@@ -108,9 +108,9 @@ export async function PATCH(
       },
       include: {
         user: true,
-        items: {
+        orderItems: {
           include: {
-            menuItem: true,
+            item: true,
           },
         },
       },

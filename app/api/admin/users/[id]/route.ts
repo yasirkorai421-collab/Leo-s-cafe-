@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@/utils/supabase/server';
+import { createClient } from '@/utils/supabase/server';
 import prisma from '@/lib/prisma';
 
 // PATCH - Update user
@@ -8,7 +8,7 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = await createServerClient();
+    const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -17,7 +17,7 @@ export async function PATCH(
 
     // Check if user is admin
     const dbUser = await prisma.user.findUnique({
-      where: { email: user.email! },
+      where: { clerkId: user.id },
       select: { role: true },
     });
 
@@ -34,7 +34,7 @@ export async function PATCH(
       data: {
         name: name || null,
         role: role || 'customer',
-        loyaltyPoints: loyaltyPoints || 0,
+        loyaltyBalance: loyaltyPoints || 0,
         birthday: birthday || null,
       },
       select: {
@@ -42,7 +42,7 @@ export async function PATCH(
         email: true,
         name: true,
         role: true,
-        loyaltyPoints: true,
+        loyaltyBalance: true,
         birthday: true,
         createdAt: true,
       },
@@ -61,7 +61,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = await createServerClient();
+    const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -70,7 +70,7 @@ export async function DELETE(
 
     // Check if user is admin
     const dbUser = await prisma.user.findUnique({
-      where: { email: user.email! },
+      where: { clerkId: user.id },
       select: { role: true },
     });
 
@@ -102,16 +102,11 @@ export async function DELETE(
     try {
       const targetUser = await prisma.user.findUnique({
         where: { id: params.id },
-        select: { email: true },
+        select: { clerkId: true },
       });
       
-      if (targetUser) {
-        const { data: authUsers } = await supabase.auth.admin.listUsers();
-        const authUser = authUsers.users.find(u => u.email === targetUser.email);
-        
-        if (authUser) {
-          await supabase.auth.admin.deleteUser(authUser.id);
-        }
+      if (targetUser?.clerkId) {
+        await supabase.auth.admin.deleteUser(targetUser.clerkId);
       }
     } catch (supabaseError) {
       console.warn('Failed to delete Supabase auth user:', supabaseError);

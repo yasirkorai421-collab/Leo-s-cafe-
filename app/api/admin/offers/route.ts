@@ -13,7 +13,7 @@ const createOfferSchema = z.object({
   description: z.string().min(1, "Description is required"),
   imageUrl: z.string().url("Valid image URL required"),
   termsAndConditions: z.string().optional(),
-  discountType: z.enum(["percentage", "fixed_amount"]),
+  discountType: z.enum(["percent", "flat"]),
   discountValue: z.number().positive("Discount value must be positive"),
   code: z.string().optional().nullable(),
   startsAt: z.string().datetime(),

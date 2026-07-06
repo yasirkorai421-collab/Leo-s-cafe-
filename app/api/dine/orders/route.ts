@@ -112,6 +112,7 @@ export async function POST(request: Request) {
     if (!dineInUser) {
       dineInUser = await prisma.user.create({
         data: {
+          clerkId: "dine_in_system",
           phone: "dine_in_system",
           name: "Dine-In Customer",
           role: "user",

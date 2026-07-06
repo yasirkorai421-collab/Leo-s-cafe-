@@ -14,7 +14,7 @@ const updateOfferSchema = z.object({
   description: z.string().min(1).optional(),
   imageUrl: z.string().url().optional(),
   termsAndConditions: z.string().optional().nullable(),
-  discountType: z.enum(["percentage", "fixed_amount"]).optional(),
+  discountType: z.enum(["percent", "flat"]).optional(),
   discountValue: z.number().positive().optional(),
   code: z.string().optional().nullable(),
   startsAt: z.string().datetime().optional(),

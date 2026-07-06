@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@/utils/supabase/server';
+import { createClient } from '@/utils/supabase/server';
 import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 
 // GET - Fetch all users
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createServerClient();
+    const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
 
     // Check if user is admin
     const dbUser = await prisma.user.findUnique({
-      where: { email: user.email! },
+      where: { clerkId: user.id },
       select: { role: true },
     });
 
@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
         email: true,
         name: true,
         role: true,
-        loyaltyPoints: true,
+        loyaltyBalance: true,
         birthday: true,
         createdAt: true,
       },
@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
 // POST - Create new user
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createServerClient();
+    const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
 
     // Check if user is admin
     const dbUser = await prisma.user.findUnique({
-      where: { email: user.email! },
+      where: { clerkId: user.id },
       select: { role: true },
     });
 
@@ -67,39 +67,51 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { email, password, name, role, loyaltyPoints, birthday } = body;
+    const { phone, password, name, role, email, loyaltyPoints, birthday } = body;
 
     // Validate required fields
-    if (!email || !password) {
+    if (!phone) {
       return NextResponse.json(
-        { error: 'Email and password are required' },
+        { error: 'Phone number is required' },
         { status: 400 }
       );
     }
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
-      where: { email },
+      where: { phone },
     });
 
     if (existingUser) {
       return NextResponse.json(
-        { error: 'User with this email already exists' },
+        { error: 'User with this phone number already exists' },
         { status: 400 }
       );
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // Create user in Supabase Auth first
+    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+      phone,
+      phone_confirm: true,
+      user_metadata: { name: name || '' }
+    });
+
+    if (authError || !authData.user) {
+      return NextResponse.json(
+        { error: authError?.message || 'Failed to create auth user' },
+        { status: 500 }
+      );
+    }
 
     // Create user in database
     const newUser = await prisma.user.create({
       data: {
-        email,
-        password: hashedPassword,
-        name: name || null,
-        role: role || 'customer',
-        loyaltyPoints: loyaltyPoints || 0,
+        clerkId: authData.user.id,
+        phone,
+        email: email || null,
+        name: name || 'User',
+        role: role || 'user',
+        loyaltyBalance: loyaltyPoints || 0,
         birthday: birthday || null,
       },
       select: {
@@ -107,25 +119,11 @@ export async function POST(request: NextRequest) {
         email: true,
         name: true,
         role: true,
-        loyaltyPoints: true,
+        loyaltyBalance: true,
         birthday: true,
         createdAt: true,
       },
     });
-
-    // Also create in Supabase Auth (optional - for login capability)
-    try {
-      const supabaseAdmin = await createServerClient();
-      await supabaseAdmin.auth.admin.createUser({
-        email,
-        password,
-        email_confirm: true,
-        user_metadata: { name: name || '' },
-      });
-    } catch (supabaseError) {
-      console.warn('Failed to create Supabase auth user:', supabaseError);
-      // Continue anyway - user is created in database
-    }
 
     return NextResponse.json({ user: newUser }, { status: 201 });
   } catch (error) {

@@ -22,7 +22,7 @@ export async function GET() {
 
     // Pending verification count
     const pendingVerification = await prisma.order.count({
-      where: { paymentStatus: "submitted" },
+      where: { paymentStatus: "screenshot_uploaded" },
     });
 
     // Top selling items

@@ -68,7 +68,7 @@ export async function seedDeliveryPersonnel() {
 
       // Check if user exists
       const { data: existingUsers } = await supabase.auth.admin.listUsers();
-      const existingUser = existingUsers?.users.find((u) => u.email === person.email);
+      const existingUser = existingUsers?.users.find((u: any) => u.email === person.email);
 
       let supabaseUserId: string;
 

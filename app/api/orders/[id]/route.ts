@@ -19,11 +19,7 @@ export async function GET(
     const authResult = await checkOrderOwnership(id);
 
     if (!authResult.authorized) {
-      if (authResult.reason === "unauthenticated") {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-      }
-      // CLAUDE.md: Return 404, not 403, to non-owners
-      return NextResponse.json({ error: "Order not found" }, { status: 404 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Fetch order with related data

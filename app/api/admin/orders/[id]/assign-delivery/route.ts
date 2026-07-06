@@ -70,7 +70,6 @@ export async function PATCH(
       where: { id },
       data: {
         deliveryPersonId,
-        status: order.status === "pending" ? "confirmed" : order.status,
       },
       include: {
         deliveryPerson: {
