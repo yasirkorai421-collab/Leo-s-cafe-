@@ -1,46 +1,45 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/utils/supabase/middleware";
 
-const publicRoutes = [
-  /^\/$/,
-  /^\/menu$/,
-  /^\/about$/,
-  /^\/contact$/,
-  /^\/offers$/,
-  /^\/track-order\/(.*)/,
-  /^\/auth\/login$/,
-  /^\/auth\/signup$/,
-  /^\/auth\/callback$/,
-  /^\/admin\/login$/,
-  /^\/delivery\/login$/,
-  /^\/api\/auth\/send-otp$/,
-  /^\/api\/auth\/verify-otp$/,
-  /^\/api\/otp\/send$/,
-  /^\/api\/otp\/verify$/,
-  /^\/api\/test-otp$/,
-  /^\/api\/offers$/,
-  /^\/api\/menu(.*)/,
-  /^\/api\/webhooks\/(.*)/,
-  /^\/api\/dine\/scan(.*)/,
+// Optimized public routes - faster string matching
+const publicPaths = new Set([
+  '/',
+  '/menu',
+  '/about',
+  '/contact',
+  '/offers',
+  '/auth/login',
+  '/auth/signup',
+  '/auth/callback',
+  '/admin/login',
+  '/delivery/login',
+]);
+
+const publicPrefixes = [
+  '/track-order/',
+  '/api/auth/',
+  '/api/otp/',
+  '/api/offers',
+  '/api/menu',
+  '/api/webhooks/',
+  '/api/dine/',
 ];
 
-const adminRoutes = [
-  /^\/admin(?!\/login)(.*)/,
-  /^\/api\/admin(.*)/,
-];
 
-const deliveryRoutes = [
-  /^\/delivery(?!\/login)(.*)/,
-  /^\/api\/delivery(.*)/,
-];
 
-const authRoutes = [
-  /^\/auth\/login$/,
-  /^\/auth\/signup$/,
-];
+function isPublicRoute(pathname: string): boolean {
+  if (publicPaths.has(pathname)) return true;
+  return publicPrefixes.some(prefix => pathname.startsWith(prefix));
+}
 
-function isMatch(url: string, patterns: RegExp[]) {
-  return patterns.some(pattern => pattern.test(url));
+function isAdminRoute(pathname: string): boolean {
+  return pathname.startsWith('/admin') && pathname !== '/admin/login' || 
+         pathname.startsWith('/api/admin');
+}
+
+function isDeliveryRoute(pathname: string): boolean {
+  return pathname.startsWith('/delivery') && pathname !== '/delivery/login' || 
+         pathname.startsWith('/api/delivery');
 }
 
 export async function middleware(request: NextRequest) {
@@ -101,7 +100,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Public routes - allow everyone
-  if (isMatch(pathname, publicRoutes)) {
+  if (isPublicRoute(pathname)) {
     return response;
   }
 
@@ -113,25 +112,21 @@ export async function middleware(request: NextRequest) {
   }
 
   // Admin routes - require admin role
-  if (isMatch(pathname, adminRoutes)) {
-    const isAdmin = user?.user_metadata?.role === "admin";
-    if (!isAdmin) {
-      // Return 404 to non-admin (security best practice)
+  if (isAdminRoute(pathname)) {
+    if (user?.user_metadata?.role !== "admin") {
       return new NextResponse("Not Found", { status: 404 });
     }
   }
 
   // Delivery routes - require delivery_person role
-  if (isMatch(pathname, deliveryRoutes)) {
-    const isDelivery = user?.user_metadata?.role === "delivery_person";
-    if (!isDelivery) {
-      // Return 404 to non-delivery personnel (security best practice)
+  if (isDeliveryRoute(pathname)) {
+    if (user?.user_metadata?.role !== "delivery_person") {
       return new NextResponse("Not Found", { status: 404 });
     }
   }
 
   // Auth routes - redirect if already logged in
-  if (isMatch(pathname, authRoutes) && user) {
+  if ((pathname === '/auth/login' || pathname === '/auth/signup') && user) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
