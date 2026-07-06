@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 import FloatingCartButton from "@/components/FloatingCartButton";
 import FloatingCallButton from "@/components/FloatingCallButton";
 import BottomNavBar from "@/components/BottomNavBar";
-import { Toaster } from "react-hot-toast";
+import ToasterProvider from "@/components/ToasterProvider";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -45,7 +45,7 @@ export default function RootLayout({
       className={`${poppins.variable} ${baloo.variable} ${alexBrush.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans bg-page text-body-gray">
-        <Toaster position="top-right" />
+        <ToasterProvider />
         <SiteHeader />
         {children}
         <Footer />
