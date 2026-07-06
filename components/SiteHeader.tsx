@@ -40,13 +40,6 @@ export default function SiteHeader() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Don't show header on auth pages if not authenticated
-  const isAuthPage = pathname?.startsWith('/auth/');
-  
-  if (!isAuthenticated && !isAuthPage) {
-    return null; // Hide header when not logged in (except on auth pages)
-  }
-
   return (
     <>
       <header

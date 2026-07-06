@@ -3,35 +3,13 @@
 import { useCart } from "@/store/cart";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { createClient } from "@/utils/supabase/client";
 
 export default function FloatingCartButton() {
   const { items } = useCart();
   const [isPulse, setIsPulse] = useState(false);
   const [prevCount, setPrevCount] = useState(0);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const supabase = createClient();
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-
-  // Check authentication status
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setIsAuthenticated(!!user);
-    };
-    
-    checkAuth();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsAuthenticated(!!session?.user);
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [supabase.auth]);
 
   // Pulse animation when items added
   useEffect(() => {
@@ -46,8 +24,8 @@ export default function FloatingCartButton() {
     setPrevCount(totalItems);
   }, [totalItems, prevCount]);
 
-  // Don't show if not authenticated or cart is empty
-  if (!isAuthenticated || totalItems === 0) return null;
+  // Don't show if cart is empty
+  if (totalItems === 0) return null;
 
   return (
     <Link

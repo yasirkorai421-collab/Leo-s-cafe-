@@ -35,6 +35,14 @@ const nextConfig = {
       };
     }
     
+    // Reduce cache warnings
+    if (config.cache && !isServer) {
+      config.cache = {
+        ...config.cache,
+        maxMemoryGenerations: 1,
+      };
+    }
+    
     return config;
   },
 
