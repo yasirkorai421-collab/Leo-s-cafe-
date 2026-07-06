@@ -1,266 +1,301 @@
-# Leo's Cafe - Online Ordering Platform
+# 🍕 Leo's Cafe - Complete Management System
 
-A full-featured online food ordering platform with delivery, dine-in QR ordering, loyalty rewards, and comprehensive admin management.
+A modern, full-stack cafe management system built with Next.js 15, TypeScript, Prisma, and Supabase.
 
-## Features
+## 🚀 Features
 
 ### Customer Features
-- 🍕 **Menu Browsing** - Browse categories, search items, view customizations
-- 🛒 **Shopping Cart** - Full cart management with edit, remove, and quantity controls
-- 💳 **Checkout** - Streamlined checkout with order confirmation
-- 📱 **WhatsApp Payment** - Screenshot-based payment with JazzCash/Easypaisa/Bank
-- 📦 **Order Tracking** - Real-time order status updates
-- 📋 **Order History** - View all your past orders
-- 🎯 **Dine-In QR Ordering** - Scan table QR, order without waiting
-- ⭐ **Favorites** - Save favorite menu items
-- 🎁 **Loyalty Rewards** - Earn points, redeem vouchers, birthday rewards
-- 🎂 **Birthday Program** - Automatic birthday vouchers
-- 💝 **Win-Back Offers** - Re-engagement discounts for inactive customers
-- 📱 **Mobile OTP Verification** - Secure phone number verification
+- 📱 **Menu Browsing** - Interactive menu with categories and search
+- 🛒 **Shopping Cart** - Persistent cart with customizations
+- 💳 **Dual Payment Options** - Cash on Delivery & Online Payment with screenshot upload
+- 📋 **Order Tracking** - Real-time order status tracking
+- 🎟️ **Reservations** - Table booking with admin approval workflow
+- 🎁 **Offers & Promotions** - View and use discount codes
+- ⭐ **Reviews** - Rate and review menu items
+- 💝 **Loyalty Program** - Earn and redeem points
+- 📞 **OTP Authentication** - Secure SMS-based login
 
-### Admin Features
-- 📊 **Analytics Dashboard** - Revenue, orders, top items
-- 📋 **Order Management** - View, filter, update order status
-- ✅ **Payment Verification** - Approve WhatsApp payment screenshots
-- 🍽️ **Menu Management** - Add/edit menu items via API
-- 🪑 **Table Management** - Create tables, generate QR codes, rotate tokens
-- ⚙️ **Settings** - Configure loyalty rates, payment details, offers
-- 🎫 **Review Claims** - Approve Google review point claims
-- 📝 **Audit Logs** - Complete admin action history
+### Admin Dashboard
+- 📊 **Order Management** - Payment verification, status updates, delivery assignment
+- 🚴 **Delivery Personnel Management** - CRUD operations for riders
+- 📅 **Reservation Management** - Approve/reject table bookings with bulk operations
+- 🎁 **Offers Management** - Create and manage promotional campaigns
+- 📸 **Stories/Gallery Management** - Upload and approve homepage images
+- 🍽️ **Menu Management** - Update prices and item availability
+- 👥 **Customer Management** - View customer details and order history
+- 📈 **Analytics Dashboard** - Sales, orders, and customer insights
 
-## Tech Stack
+### Delivery Personnel Dashboard
+- 📦 **Order List** - View assigned deliveries
+- 🔄 **Status Updates** - Update order status (picked up → out for delivery → delivered)
+- 📱 **SMS Notifications** - Automatic customer notifications
 
-- **Framework**: Next.js 16 App Router
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS 4
-- **Database**: PostgreSQL (via Supabase)
-- **ORM**: Prisma 7
-- **Auth**: Supabase Authentication with phone OTP verification
-- **Uploads**: Cloudinary
-- **Animation**: Framer Motion
-- **State**: Zustand (cart), TanStack Query
-- **Forms**: React Hook Form + Zod validation
+## 🛠️ Tech Stack
 
-## Environment Variables
+- **Framework:** Next.js 15 (App Router)
+- **Language:** TypeScript
+- **Database:** PostgreSQL with Prisma ORM
+- **Authentication:** Supabase Auth
+- **State Management:** Zustand
+- **Styling:** Tailwind CSS
+- **UI Components:** Radix UI
+- **Forms:** React Hook Form + Zod validation
+- **SMS:** MSG91, Twilio (with fallback)
+- **Notifications:** React Hot Toast
 
-Copy `.env.example` to `.env.local` and fill in the values:
+## 📋 Prerequisites
+
+- Node.js 18+ and npm/yarn
+- PostgreSQL database
+- Supabase account
+- SMS provider account (MSG91 or Twilio)
+
+## 🚀 Getting Started
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/yourusername/leos-cafe.git
+cd leos-cafe
+```
+
+### 2. Install Dependencies
+
+```bash
+npm install
+```
+
+### 3. Environment Setup
+
+Copy the example environment file:
+
+```bash
+cp .env.example .env.local
+```
+
+Fill in your actual values in `.env.local`:
 
 ```bash
 # Database
 DATABASE_URL="postgresql://..."
 DIRECT_URL="postgresql://..."
 
-# Supabase Auth
-NEXT_PUBLIC_SUPABASE_URL=https://...
-NEXT_PUBLIC_SUPABASE_ANON_KEY=...
-SUPABASE_SERVICE_ROLE_KEY=...
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL="https://your-project.supabase.co"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="your-anon-key"
+SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"
 
-# SMS OTP
-MSG91_API_KEY=your_msg91_api_key
-MSG91_SENDER_ID=LEOCAFE
-TWILIO_ACCOUNT_SID=your_twilio_account_sid
-TWILIO_AUTH_TOKEN=your_twilio_auth_token
-TWILIO_PHONE_NUMBER=+1234567890
-TWILIO_WHATSAPP_NUMBER=whatsapp:+14155238886
+# Admin Credentials
+ADMIN_EMAIL="admin@leoscafe.com"
+ADMIN_PASSWORD="your-secure-password"
+ADMIN_PHONE="+923001234567"
+ADMIN_NAME="Admin"
 
-# Cloudinary
-NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=
-CLOUDINARY_API_KEY=
-CLOUDINARY_API_SECRET=
+# Delivery Personnel
+DELIVERY_PERSONNEL="Rider 1|rider1@leoscafe.com|rider1pass|+923001111111"
+
+# SMS Configuration
+HOST_PHONE_NUMBER="+923001234567"
+MSG91_API_KEY="your-msg91-api-key"
+# ... other SMS settings
 
 # Payment Settings
-PAYMENT_JAZZCASH_NUMBER=
-PAYMENT_EASYPAISA_NUMBER=
-PAYMENT_BANK_NAME=
-PAYMENT_BANK_ACCOUNT=
-PAYMENT_BANK_IBAN=
-PAYMENT_WHATSAPP_NUMBER=
-
-# Security
-QR_SECRET= # Generate with: openssl rand -base64 32
-CRON_SECRET=
-
-# Redis (optional but recommended)
-UPSTASH_REDIS_REST_URL=
-UPSTASH_REDIS_REST_TOKEN=
+JAZZCASH_NUMBER="03001234567"
+EASYPAISA_NUMBER="03001234567"
+# ... other payment settings
 ```
 
-## Setup Instructions
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yasirkorai421-collab/Leo-s-cafe-.git
-   cd Leo-s-cafe-
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Set up environment variables**
-   ```bash
-   cp .env.example .env.local
-   # Edit .env.local with your actual values
-   ```
-
-4. **Set up Supabase database**
-   - Create a Supabase project
-   - Copy the connection string to `DATABASE_URL`
-
-5. **Run Prisma migrations**
-   ```bash
-   npx prisma generate
-   npx prisma db push
-   ```
-
-6. **Run development server**
-   ```bash
-   npm run dev
-   ```
-
-7. **Configure OTP delivery**
-   - Add `MSG91_API_KEY` and `MSG91_SENDER_ID` (or Twilio credentials) to `.env.local`
-   - Restart the dev server after changing environment variables
-
-7. **Access the application**
-   - Open [http://localhost:3000](http://localhost:3000)
-
-## Deployment
-
-### Deploy to Vercel
-
-1. **Push to GitHub** (already done)
-
-2. **Import to Vercel**
-   - Go to [vercel.com](https://vercel.com)
-   - Click "New Project"
-   - Import from GitHub: `yasirkorai421-collab/Leo-s-cafe-`
-
-3. **Configure Environment Variables**
-   - Add all variables from `.env.example`
-   - Generate secrets for `QR_TOKEN_SECRET`, `UPLOAD_SECRET`, `CRON_SECRET`
-
-4. **Deploy**
-   - Vercel will automatically build and deploy
-   - Your app will be live at: `https://your-project.vercel.app`
-
-5. **Set up Supabase**
-   - Create a Supabase project if not done
-   - Update `DATABASE_URL` in Vercel environment variables
-   - Run migrations: `npx prisma db push`
-
-6. **Set up OTP delivery**
-   - Add the MSG91 or Twilio credentials in Vercel environment variables
-   - Make sure your sender ID is approved for the provider you use
-
-7. **Set up Cloudinary**
-   - Create Cloudinary account
-   - Add credentials to Vercel env variables
-
-## Database Schema
-
-15 tables:
-- `users` - Customer/admin accounts
-- `categories` - Menu categories
-- `menu_items` - Food items
-- `customizations` - Item customizations
-- `orders` - Customer orders
-- `order_items` - Order line items
-- `payment_proofs` - Payment screenshots
-- `reviews` - Customer reviews
-- `offers` - Promotional offers
-- `loyalty_ledger` - Points transactions
-- `vouchers` - Discount vouchers
-- `review_point_claims` - Google review claims
-- `tables` - Dine-in tables
-- `table_sessions` - Active QR sessions
-- `favorites` - Saved menu items
-- `audit_log` - Admin action history
-
-## Security Features
-
-✅ Server-side price recomputation
-✅ Single payment confirmation path
-✅ Ownership checks on all user data
-✅ HMAC-signed QR tokens
-✅ Transaction-wrapped financial operations
-✅ Idempotent value-granting operations
-✅ DB-level uniqueness constraints
-✅ CSRF protection on dine-in orders
-✅ Audit logging on admin actions
-✅ HttpOnly, secure, SameSite cookies
-
-## Project Structure
-
-```
-leos-cafe-app/
-├── app/                    # Next.js App Router
-│   ├── api/               # API routes
-│   ├── admin/             # Admin pages
-│   ├── menu/              # Menu browsing
-│   ├── checkout/          # Checkout flow
-│   ├── order/             # Order tracking/payment
-│   ├── dine/              # Dine-in QR ordering
-│   ├── favorites/         # Favorites page
-│   └── profile/           # User profile
-├── components/            # React components
-├── lib/                   # Shared utilities
-│   ├── prisma.ts         # Prisma client
-│   ├── ownership.ts      # Ownership checks
-│   ├── settings.ts       # Admin settings
-│   ├── qrToken.ts        # QR token signing
-│   └── notificationService.ts
-├── schemas/               # Zod validation schemas
-├── store/                 # Zustand stores
-├── prisma/                # Database schema
-├── CLAUDE.md             # Security rules
-└── PROJECT.md            # Current state
-```
-
-## Admin Access
-
-### Making a User Admin
-
-#### Method 1: Using Supabase Dashboard (Recommended)
-
-1. Go to your Supabase project dashboard
-2. Navigate to **Table Editor** → **users** table  
-3. Find the user by email or phone
-4. Edit the `role` field and change from `user` to `admin`
-5. Save changes
-
-#### Method 2: Using SQL Query
-
-```sql
--- Find your user ID first
-SELECT id, name, email FROM users WHERE email = 'your-email@example.com';
-
--- Update to admin role
-UPDATE users SET role = 'admin' WHERE id = 'your-user-uuid';
-```
-
-#### Method 3: Using Admin Creation Script
+### 4. Database Setup
 
 ```bash
-npm run admin:create
+# Generate Prisma client
+npx prisma generate
+
+# Run migrations
+npx prisma migrate deploy
+
+# (Optional) Open Prisma Studio to view database
+npm run db:studio
 ```
 
-Follow the prompts to create a new admin user.
+### 5. Seed Admin & Delivery Personnel
 
-## Cron Jobs
+```bash
+npm run seed:users
+```
 
-Set up these cron endpoints on Vercel/external service:
+This will create:
+- Admin account in Supabase Auth and database
+- Delivery personnel accounts based on `DELIVERY_PERSONNEL` env variable
 
-- `GET /api/cron/birthday` - Daily at midnight (birthday vouchers)
-- `GET /api/cron/winback` - Daily at midnight (win-back vouchers)
+### 6. Run Development Server
 
-Add `Authorization: Bearer YOUR_CRON_SECRET` header.
+```bash
+npm run dev
+```
 
-## License
+Visit `http://localhost:3001`
 
-Private project - All rights reserved
+## 🔐 Admin Setup
 
-## Contact
+Detailed admin setup instructions are in [ADMIN_SETUP.md](./ADMIN_SETUP.md)
 
-For support: yasirkorai421@gmail.com
+### Quick Start:
+1. Configure `ADMIN_EMAIL`, `ADMIN_PASSWORD` in `.env.local`
+2. Run `npm run seed:users`
+3. Visit `/admin/login`
+4. Login with your admin credentials
+
+## 📱 Delivery Personnel Setup
+
+1. Add delivery personnel to `DELIVERY_PERSONNEL` environment variable
+2. Run `npm run seed:users`
+3. Riders can login at `/delivery/login`
+
+## 🗂️ Project Structure
+
+```
+leos-cafe/
+├── app/                      # Next.js App Router pages
+│   ├── admin/               # Admin dashboard pages
+│   ├── delivery/            # Delivery personnel pages
+│   ├── api/                 # API routes
+│   ├── menu/                # Menu page
+│   ├── offers/              # Offers page
+│   └── track-order/         # Order tracking
+├── components/              # React components
+├── lib/                     # Utility functions
+│   ├── prisma.ts           # Prisma client
+│   ├── ownership.ts        # Auth helpers
+│   ├── sms.ts              # SMS service
+│   └── seed-*.ts           # Seeding scripts
+├── store/                   # Zustand stores
+│   └── cart.ts             # Shopping cart
+├── hooks/                   # Custom React hooks
+├── prisma/                  # Database schema
+│   └── schema.prisma
+├── public/                  # Static assets
+└── utils/                   # Supabase helpers
+```
+
+## 📚 Key Routes
+
+### Customer Routes
+- `/` - Homepage
+- `/menu` - Browse menu
+- `/cart` - Shopping cart
+- `/offers` - Active offers
+- `/track-order/[id]` - Track order
+- `/my-reservations` - View reservations
+
+### Admin Routes
+- `/admin/login` - Admin login
+- `/admin/orders` - Order management
+- `/admin/reservations` - Reservation management
+- `/admin/delivery-personnel` - Manage riders
+- `/admin/offers` - Offers management
+- `/admin/stories` - Gallery management
+- `/admin/menu` - Menu price management
+- `/admin/customers` - Customer management
+
+### Delivery Routes
+- `/delivery/login` - Delivery login
+- `/delivery/dashboard` - View and update deliveries
+
+## 🔧 Available Scripts
+
+```bash
+npm run dev              # Start development server
+npm run build            # Build for production
+npm run start            # Start production server
+npm run lint             # Run ESLint
+npm run db:generate      # Generate Prisma client
+npm run db:push          # Push schema to database
+npm run db:migrate       # Run migrations
+npm run db:studio        # Open Prisma Studio
+npm run seed:users       # Seed admin & delivery users
+```
+
+## 🌐 Deployment
+
+### Vercel (Recommended)
+
+1. Push code to GitHub
+2. Import project in Vercel
+3. Add environment variables from `.env.example`
+4. Deploy
+
+The build script automatically runs migrations and seeding.
+
+### Manual Deployment
+
+```bash
+# Build the application
+npm run build
+
+# Run migrations
+npx prisma migrate deploy
+
+# Seed users
+npm run seed:users
+
+# Start production server
+npm start
+```
+
+## 🔒 Security Features
+
+- Role-based access control (Admin, Delivery, User)
+- HTTPS enforcement in production
+- CSRF protection
+- XSS protection headers
+- Content Security Policy
+- SQL injection prevention via Prisma
+- Password hashing via Supabase Auth
+- Secure cookie handling
+
+## 📊 Database Schema
+
+The system uses PostgreSQL with the following main models:
+- Users (customers, admin, delivery personnel)
+- MenuItems & Categories
+- Orders & OrderItems
+- Reservations
+- Offers
+- Stories (homepage gallery)
+- Reviews
+- LoyaltyLedger
+- AuditLog
+
+See `prisma/schema.prisma` for complete schema.
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License.
+
+## 🙏 Acknowledgments
+
+- Next.js team for the amazing framework
+- Supabase for authentication
+- Prisma for the excellent ORM
+- Radix UI for accessible components
+
+## 📞 Support
+
+For issues or questions:
+1. Check [ADMIN_SETUP.md](./ADMIN_SETUP.md) for admin-specific help
+2. Review error logs
+3. Check Supabase Auth dashboard
+4. Open an issue on GitHub
+
+---
+
+**Made with ❤️ for Leo's Cafe**

@@ -2,21 +2,36 @@ import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@/utils/supabase/middleware";
 
 const publicRoutes = [
+  /^\/$/,
+  /^\/menu$/,
+  /^\/about$/,
+  /^\/contact$/,
+  /^\/offers$/,
+  /^\/track-order\/(.*)/,
   /^\/auth\/login$/,
   /^\/auth\/signup$/,
   /^\/auth\/callback$/,
+  /^\/admin\/login$/,
+  /^\/delivery\/login$/,
   /^\/api\/auth\/send-otp$/,
   /^\/api\/auth\/verify-otp$/,
   /^\/api\/otp\/send$/,
   /^\/api\/otp\/verify$/,
   /^\/api\/test-otp$/,
+  /^\/api\/offers$/,
+  /^\/api\/menu(.*)/,
   /^\/api\/webhooks\/(.*)/,
   /^\/api\/dine\/scan(.*)/,
 ];
 
 const adminRoutes = [
-  /^\/admin(.*)/,
+  /^\/admin(?!\/login)(.*)/,
   /^\/api\/admin(.*)/,
+];
+
+const deliveryRoutes = [
+  /^\/delivery(?!\/login)(.*)/,
+  /^\/api\/delivery(.*)/,
 ];
 
 const authRoutes = [
@@ -102,6 +117,15 @@ export async function middleware(request: NextRequest) {
     const isAdmin = user?.user_metadata?.role === "admin";
     if (!isAdmin) {
       // Return 404 to non-admin (security best practice)
+      return new NextResponse("Not Found", { status: 404 });
+    }
+  }
+
+  // Delivery routes - require delivery_person role
+  if (isMatch(pathname, deliveryRoutes)) {
+    const isDelivery = user?.user_metadata?.role === "delivery_person";
+    if (!isDelivery) {
+      // Return 404 to non-delivery personnel (security best practice)
       return new NextResponse("Not Found", { status: 404 });
     }
   }

@@ -72,7 +72,7 @@ export async function PATCH(
         where: { id },
         data: {
           paymentStatus: action === "approve" ? "verified" : "rejected",
-          status: action === "approve" ? "confirmed" : "payment_submitted",
+          status: action === "approve" ? "confirmed" : (order.paymentMethod === "cash_on_delivery" ? "payment_cod" : "payment_online"),
         },
       });
 

@@ -4,14 +4,15 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3001",
-    "build": "next build",
+    "build": "prisma generate && prisma migrate deploy && next build",
     "start": "next start",
     "lint": "next lint",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate deploy",
     "db:studio": "prisma studio",
-    "admin:create": "npx tsx scripts/create-admin.ts"
+    "admin:create": "npx tsx scripts/create-admin.ts",
+    "seed:users": "npx tsx scripts/seed-users.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

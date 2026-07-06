@@ -19,6 +19,7 @@ datasource db {
 enum UserRole {
   user
   admin
+  delivery_person
 }
 
 model User {
@@ -39,6 +40,7 @@ model User {
   
   // Relations
   orders              Order[]
+  deliveryOrders      Order[]  @relation("DeliveryPerson")
   paymentVerifications PaymentProof[] @relation("VerifiedBy")
   reviews             Review[]
   loyaltyLedgerUser   LoyaltyLedger[] @relation("LoyaltyUser")
@@ -50,6 +52,7 @@ model User {
   offersCreated       Offer[]    @relation("CreatedBy")
   offersUpdated       Offer[]    @relation("UpdatedBy")
   auditLogs           AuditLog[]
+  reservations        Reservation[]
 
   @@map("users")
 }
@@ -135,17 +138,19 @@ model Customization {
 enum OrderStatus {
   pending_payment      // Waiting for payment method selection
   payment_cod          // Cash on Delivery selected
-  payment_whatsapp     // WhatsApp screenshot uploaded
+  payment_online       // Online payment screenshot uploaded
   confirmed            // Admin verified payment
-  preparing           // Kitchen is preparing
-  ready               // Ready for pickup/delivery
-  delivered           // Completed
-  cancelled           // Cancelled
+  preparing            // Kitchen is preparing
+  ready                // Ready for pickup/delivery
+  picked_up            // Delivery person picked up the order
+  out_for_delivery     // Delivery person is on the way
+  delivered            // Completed
+  cancelled            // Cancelled
 }
 
 enum PaymentMethod {
   cash_on_delivery
-  whatsapp_screenshot
+  online_payment
 }
 
 enum PaymentStatus {
@@ -165,22 +170,25 @@ model Order {
   id                String        @id @default(uuid())
   userId            String        @map("user_id")
   status            OrderStatus   @default(pending_payment)
-  paymentMethod     PaymentMethod? @map("payment_method") // COD or WhatsApp
+  paymentMethod     PaymentMethod? @map("payment_method") // COD or Online
   paymentStatus     PaymentStatus @default(pending) @map("payment_status")
   orderType         OrderType     @default(delivery) @map("order_type") // Epic 6: dine-in support
   tableSessionId    String?       @map("table_session_id") // Epic 6: link to table session
+  deliveryPersonId  String?       @map("delivery_person_id") // Assigned delivery person
   total             Decimal       @db.Decimal(10, 2)
   deliveryAddress   String?       @map("delivery_address") // Null for dine-in orders
+  customerNotes     String?       @map("customer_notes") @db.Text // Customer order notes
   adminNotes        String?       @map("admin_notes") @db.Text // Admin can add notes
   createdAt         DateTime      @default(now()) @map("created_at")
   updatedAt         DateTime      @updatedAt @map("updated_at")
   
   // Relations
-  user          User           @relation(fields: [userId], references: [id], onDelete: Restrict) // CLAUDE.md rule 16
-  orderItems    OrderItem[]
-  paymentProofs PaymentProof[]
-  tableSession  TableSession?  @relation(fields: [tableSessionId], references: [id], onDelete: SetNull) // CLAUDE.md rule 16
-  voucherUsed   Voucher?       @relation("VoucherUsed")
+  user           User           @relation(fields: [userId], references: [id], onDelete: Restrict) // CLAUDE.md rule 16
+  deliveryPerson User?          @relation("DeliveryPerson", fields: [deliveryPersonId], references: [id], onDelete: SetNull)
+  orderItems     OrderItem[]
+  paymentProofs  PaymentProof[]
+  tableSession   TableSession?  @relation(fields: [tableSessionId], references: [id], onDelete: SetNull) // CLAUDE.md rule 16
+  voucherUsed    Voucher?       @relation("VoucherUsed")
 
   @@map("orders")
 }
@@ -255,6 +263,7 @@ model Offer {
   title         String
   description   String       @db.Text
   imageUrl      String       @map("image_url")
+  termsAndConditions String?  @map("terms_and_conditions") @db.Text // How to avail the offer
   discountType  DiscountType @map("discount_type")
   discountValue Decimal      @db.Decimal(10, 2) @map("discount_value")
   code          String?      @unique // Null for automatic/banner offers
@@ -414,6 +423,65 @@ model Favorite {
 
   @@id([userId, itemId])
   @@map("favorites")
+}
+
+// ============================================================================
+// RESERVATIONS
+// ============================================================================
+
+enum ReservationStatus {
+  pending
+  reviewing
+  confirmed
+  rejected
+  cancelled
+}
+
+model Reservation {
+  id             String            @id @default(uuid())
+  userId         String            @map("user_id")
+  name           String
+  email          String
+  phone          String
+  date           DateTime
+  time           String
+  numberOfPeople Int               @map("number_of_people")
+  specialRequest String?           @map("special_request") @db.Text
+  status         ReservationStatus @default(pending)
+  adminMessage   String?           @map("admin_message") @db.Text // Admin's custom message
+  createdAt      DateTime          @default(now()) @map("created_at")
+  updatedAt      DateTime          @updatedAt @map("updated_at")
+  
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("reservations")
+}
+
+// ============================================================================
+// STORIES / GALLERY
+// ============================================================================
+
+enum StoryStatus {
+  pending
+  approved
+  rejected
+}
+
+model Story {
+  id          String      @id @default(uuid())
+  title       String
+  imageUrl    String      @map("image_url")
+  status      StoryStatus @default(pending)
+  sortOrder   Int         @default(0) @map("sort_order")
+  isActive    Boolean     @default(true) @map("is_active")
+  uploadedBy  String?     @map("uploaded_by") // Admin who uploaded
+  approvedBy  String?     @map("approved_by") // Admin who approved
+  approvedAt  DateTime?   @map("approved_at")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  @@map("stories")
 }
 
 // ============================================================================

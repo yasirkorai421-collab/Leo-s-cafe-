@@ -14,6 +14,7 @@ export interface CartItem {
   imageUrl: string;
   quantity: number;
   customizations?: Record<string, unknown>;
+  isAvailable?: boolean; // Track availability status
 }
 
 interface CartStore {
@@ -24,6 +25,8 @@ interface CartStore {
   clearCart: () => void;
   getTotal: () => number;
   getItemCount: () => number;
+  checkAvailability: (itemId: string) => Promise<boolean>;
+  removeUnavailableItems: () => void;
 }
 
 export const useCart = create<CartStore>()(
@@ -84,6 +87,23 @@ export const useCart = create<CartStore>()(
         const { items } = get();
         return items.reduce((count, item) => count + item.quantity, 0);
       },
+
+      checkAvailability: async (itemId: string) => {
+        try {
+          const res = await fetch(`/api/menu/${itemId}/availability`);
+          if (!res.ok) return false;
+          const data = await res.json();
+          return data.available;
+        } catch (error) {
+          console.error("Availability check failed:", error);
+          return false;
+        }
+      },
+
+      removeUnavailableItems: () =>
+        set((state) => ({
+          items: state.items.filter((item) => item.isAvailable !== false),
+        })),
     }),
     {
       name: "leos-cafe-cart", // localStorage key

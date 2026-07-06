@@ -54,8 +54,9 @@ export async function POST(
     await prisma.order.update({
       where: { id },
       data: {
-        paymentStatus: "submitted",
-        status: "payment_submitted",
+        paymentMethod: "online_payment",
+        paymentStatus: "screenshot_uploaded",
+        status: "payment_online",
       },
     });
 
