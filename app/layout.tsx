@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Poppins, Baloo_2, Alex_Brush } from "next/font/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import SiteHeader from "@/components/SiteHeader";
 import Footer from "@/components/Footer";
 import FloatingCartButton from "@/components/FloatingCartButton";
@@ -54,6 +55,8 @@ export default function RootLayout({
         <FloatingCartButton />
         <FloatingCallButton />
         <BottomNavBar />
+        
+        <SpeedInsights />
       </body>
     </html>
   );
