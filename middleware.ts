@@ -33,12 +33,12 @@ function isPublicRoute(pathname: string): boolean {
 }
 
 function isAdminRoute(pathname: string): boolean {
-  return pathname.startsWith('/admin') && pathname !== '/admin/login' || 
+  return (pathname.startsWith('/admin') && pathname !== '/admin/login') || 
          pathname.startsWith('/api/admin');
 }
 
 function isDeliveryRoute(pathname: string): boolean {
-  return pathname.startsWith('/delivery') && pathname !== '/delivery/login' || 
+  return (pathname.startsWith('/delivery') && pathname !== '/delivery/login') || 
          pathname.startsWith('/api/delivery');
 }
 
