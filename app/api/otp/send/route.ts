@@ -49,7 +49,7 @@ export async function POST(request: Request) {
     console.log("[otp/send] Challenge created:", challenge.id);
 
     if (challenge.rateLimited) {
-      console.log("[otp/send] Rate limited");
+      console.warn("[otp/send] ⚠️ RATE LIMITED:", maskPhone(normalizedPhone), "- Too many requests");
       return NextResponse.json(
         { error: "Too many OTP requests. Please try again later." },
         { status: 429 }
@@ -70,12 +70,15 @@ export async function POST(request: Request) {
         });
       }
 
-      // In production, return success even if SMS fails (security)
+      // In production, return success even if SMS fails (security - don't leak phone validity)
+      console.error("[otp/send] SMS failed but returning success for security");
       return NextResponse.json(
         { success: true, message: "If the number is valid, a verification code has been sent." },
         { status: 200 }
       );
     }
+
+    console.info("[otp] ✅ OTP sent to %s via %s", maskPhone(normalizedPhone), sent.provider);
 
     return NextResponse.json({
       success: true,

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { verifyOtpChallenge, normalizePhoneNumber, maskPhone } from "@/lib/otp-store";
+import { verifyOtpChallenge, normalizePhoneNumber, maskPhone, checkChallengeLocked } from "@/lib/otp-store";
 
 const otpVerifySchema = z.object({
   phone: z.string().min(7).max(20),
@@ -36,11 +36,24 @@ export async function POST(request: Request) {
     console.log("[otp/verify] Normalizing phone...");
     const normalizedPhone = normalizePhoneNumber(phone);
     
+    // Check if challenge is locked before attempting verification
+    const challengeStatus = await checkChallengeLocked(normalizedPhone);
+    if (challengeStatus.locked) {
+      console.warn("[otp/verify] Account locked:", maskPhone(normalizedPhone));
+      return NextResponse.json(
+        { error: "Too many incorrect attempts. Please request a new code." },
+        { status: 429 }
+      );
+    }
+    
     console.log("[otp/verify] Verifying OTP...");
     const result = await verifyOtpChallenge(normalizedPhone, otp);
     console.log("[otp/verify] Verification result:", result.success);
 
     if (!result.success) {
+      // Log failed verification attempt for security monitoring
+      console.warn("[otp/verify] Failed attempt for:", maskPhone(normalizedPhone), "attempts:", result.attemptCount);
+      
       return NextResponse.json(
         { error: result.locked ? "Too many incorrect attempts. Please request a new code." : "Invalid verification code." },
         { status: 400 }
@@ -54,7 +67,7 @@ export async function POST(request: Request) {
       data: { phoneVerifiedAt: new Date() },
     });
 
-    console.info("[otp] Verified phone %s", maskPhone(normalizedPhone));
+    console.info("[otp] ✅ Verified phone %s", maskPhone(normalizedPhone));
 
     return NextResponse.json({ success: true, message: "Phone verified successfully." });
   } catch (error) {

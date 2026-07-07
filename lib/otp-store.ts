@@ -147,6 +147,22 @@ async function readChallenge(phone: string): Promise<OtpChallengeRecord | null> 
   return memoryStore.get(key) ?? null;
 }
 
+/**
+ * Check if a challenge is locked due to too many failed attempts
+ */
+export async function checkChallengeLocked(phone: string): Promise<{ locked: boolean; attemptCount: number }> {
+  const challenge = await readChallenge(phone);
+  
+  if (!challenge) {
+    return { locked: false, attemptCount: 0 };
+  }
+  
+  const now = Date.now();
+  const locked = Boolean(challenge.lockUntil && challenge.lockUntil > now);
+  
+  return { locked, attemptCount: challenge.attemptCount };
+}
+
 async function writeChallenge(challenge: OtpChallengeRecord): Promise<void> {
   const key = getStorageKey(challenge.phone);
 

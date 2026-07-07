@@ -30,6 +30,11 @@ sb_publishable_VpIhzRx897CZLE8pBkXioA_1xtrhqNw
 SUPABASE_SERVICE_ROLE_KEY
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsc3pxY3hxdW5paHd6bGhsYXNqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MjYwNTQyNCwiZXhwIjoyMDk4MTgxNDI0fQ.9I9nGkeEAqxeKfEucAwBo93zI77qh4sEo8NrnFG4Vo8
 
+SUPABASE_WEBHOOK_SECRET
+generate_random_secret_here
+⚠️  IMPORTANT: Generate with: openssl rand -base64 32
+📖 Configure in Supabase Dashboard → Database → Webhooks
+
 ADMIN_EMAIL
 yasiradmin123@gmail.com
 
@@ -44,12 +49,17 @@ Leo's Cafe Admin
 
 NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
 demo
+⚠️  IMPORTANT: Replace with your real Cloudinary Cloud Name!
+📖 See CLOUDINARY_SETUP.md for step-by-step instructions
+🔗 Get free account: https://cloudinary.com/users/register_free
 
 CLOUDINARY_API_KEY
 123456789012345
+⚠️  IMPORTANT: Replace with your real Cloudinary API Key!
 
 CLOUDINARY_API_SECRET
 abcdefghijklmnopqrstuvwxyz123456
+⚠️  IMPORTANT: Replace with your real Cloudinary API Secret!
 
 JAZZCASH_NUMBER
 03001234567
@@ -112,10 +122,24 @@ WINBACK_VALIDITY_DAYS
   AFTER DEPLOYMENT
 =================================================================================
 
-1. Update NEXT_PUBLIC_APP_URL with your actual Vercel URL
-2. Run database migrations: npx prisma migrate deploy
-3. Create admin account: npm run admin:create
-4. Visit: https://your-url.vercel.app/admin/login
+1. 🎨 **SETUP CLOUDINARY FIRST** - Images won't work with demo credentials!
+   - Follow instructions in CLOUDINARY_SETUP.md
+   - Get free account: https://cloudinary.com/users/register_free
+   - Update the 3 CLOUDINARY variables in Vercel Settings
+   - Redeploy after updating
+
+2. 🔒 **ENABLE ROW LEVEL SECURITY (CRITICAL)** - Database is exposed without RLS!
+   - Follow instructions in docs/RLS_SECURITY.md
+   - Run: scripts/setup-rls.sh
+   - Or apply prisma/migrations/add_rls_policies.sql in Supabase SQL Editor
+   - Verify with test queries in documentation
+   - ⚠️  WITHOUT RLS, USERS CAN ACCESS ALL DATA
+
+3. Update NEXT_PUBLIC_APP_URL with your actual Vercel URL
+
+4. Create admin account: npm run admin:create
+
+5. Visit: https://your-url.vercel.app/admin/login
 
 =================================================================================
   OPTIONAL: UPDATE LATER
@@ -127,7 +151,6 @@ When ready, update these in Vercel Settings > Environment Variables:
 - EASYPAISA_NUMBER (your real EasyPaisa number)  
 - BANK_ACCOUNT_NUMBER (your real bank account)
 - WHATSAPP_NUMBER (your customer support WhatsApp)
-- Cloudinary credentials (for image uploads)
 
 Then redeploy: Deployments > ... > Redeploy
 

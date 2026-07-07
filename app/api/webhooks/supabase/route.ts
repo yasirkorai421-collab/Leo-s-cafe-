@@ -2,13 +2,73 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import crypto from "crypto";
 
+/**
+ * Verify Supabase webhook signature
+ * @see https://supabase.com/docs/guides/database/webhooks#payload-signature
+ */
+function verifySupabaseSignature(
+  payload: string,
+  signature: string | null,
+  secret: string
+): boolean {
+  if (!signature || !secret) {
+    return false;
+  }
+
+  try {
+    // Supabase sends signature in format: v1=<hmac_signature>
+    const [version, hmacSignature] = signature.split("=");
+    
+    if (version !== "v1" || !hmacSignature) {
+      console.error("[webhook] Invalid signature format");
+      return false;
+    }
+
+    // Compute expected signature
+    const expectedSignature = crypto
+      .createHmac("sha256", secret)
+      .update(payload)
+      .digest("hex");
+
+    // Timing-safe comparison to prevent timing attacks
+    return crypto.timingSafeEqual(
+      Buffer.from(hmacSignature),
+      Buffer.from(expectedSignature)
+    );
+  } catch (error) {
+    console.error("[webhook] Signature verification error:", error);
+    return false;
+  }
+}
+
 export async function POST(req: Request) {
   try {
-    // Basic verification - you should configure a Webhook Secret in Supabase 
-    // and verify the authorization header in a real production environment.
-    // For local dev, we will accept the payload.
+    // SECURITY: Verify Supabase webhook signature
+    const webhookSecret = process.env.SUPABASE_WEBHOOK_SECRET;
     
-    const body = await req.json();
+    if (!webhookSecret) {
+      console.error("[webhook] SUPABASE_WEBHOOK_SECRET not configured");
+      return NextResponse.json(
+        { error: "Webhook not configured" },
+        { status: 500 }
+      );
+    }
+
+    // Get raw body for signature verification
+    const rawBody = await req.text();
+    const signature = req.headers.get("x-supabase-signature");
+
+    // Verify signature
+    if (!verifySupabaseSignature(rawBody, signature, webhookSecret)) {
+      console.error("[webhook] Invalid signature");
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    // Parse body after verification
+    const body = JSON.parse(rawBody);
 
     // Supabase auth.users insert payload
     if (body.type === "INSERT" && body.table === "users" && body.schema === "auth") {
@@ -54,7 +114,16 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ message: "Ignored event" });
   } catch (error: any) {
-    console.error("Supabase webhook error:", error);
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    console.error("[webhook] Supabase webhook error:", error);
+    
+    // Don't leak internal error details to prevent information disclosure
+    if (process.env.NODE_ENV === "production") {
+      return NextResponse.json(
+        { error: "Internal server error" },
+        { status: 500 }
+      );
+    }
+    
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
