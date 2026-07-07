@@ -1,0 +1,134 @@
+=================================================================================
+  LEO'S CAFE - VERCEL ENVIRONMENT VARIABLES
+  Copy each line below to Vercel Dashboard
+=================================================================================
+
+🚀 DEPLOYMENT STEPS:
+
+1. Go to: https://vercel.com/new
+2. Import repository: yasirkorai421-collab/Leo-s-cafe-
+3. Click "Environment Variables" dropdown
+4. Copy-paste each variable below (one by one)
+5. Click "Deploy"
+
+=================================================================================
+  COPY THESE VARIABLES TO VERCEL (42 variables total)
+=================================================================================
+
+DATABASE_URL
+postgresql://postgres.zlszqcxqunihwzlhlasj:Yas456ir123%40@aws-0-us-east-1.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1
+
+DIRECT_URL
+postgresql://postgres:Yas456ir123%40@db.zlszqcxqunihwzlhlasj.supabase.co:5432/postgres
+
+NEXT_PUBLIC_SUPABASE_URL
+https://zlszqcxqunihwzlhlasj.supabase.co
+
+NEXT_PUBLIC_SUPABASE_ANON_KEY
+sb_publishable_VpIhzRx897CZLE8pBkXioA_1xtrhqNw
+
+SUPABASE_SERVICE_ROLE_KEY
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsc3pxY3hxdW5paHd6bGhsYXNqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MjYwNTQyNCwiZXhwIjoyMDk4MTgxNDI0fQ.9I9nGkeEAqxeKfEucAwBo93zI77qh4sEo8NrnFG4Vo8
+
+ADMIN_EMAIL
+yasiradmin123@gmail.com
+
+ADMIN_PASSWORD
+765yasir432@
+
+ADMIN_PHONE
++923202412519
+
+ADMIN_NAME
+Leo's Cafe Admin
+
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+demo
+
+CLOUDINARY_API_KEY
+123456789012345
+
+CLOUDINARY_API_SECRET
+abcdefghijklmnopqrstuvwxyz123456
+
+JAZZCASH_NUMBER
+03001234567
+
+EASYPAISA_NUMBER
+03001234567
+
+BANK_NAME
+HBL Bank
+
+BANK_ACCOUNT_NUMBER
+1234567890123
+
+BANK_ACCOUNT_TITLE
+Leo's Cafe
+
+WHATSAPP_NUMBER
+923001234567
+
+CSRF_SECRET
+a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6
+
+CRON_SECRET
+x9y8z7w6v5u4t3s2r1q0p9o8n7m6l5k4
+
+QR_SECRET
+q1w2e3r4t5y6u7i8o9p0a1s2d3f4g5h6
+
+NEXT_PUBLIC_APP_URL
+https://leos-cafe.vercel.app
+
+NODE_ENV
+production
+
+POINTS_PER_RS
+1
+
+REDEMPTION_RATE
+1
+
+REVIEW_BONUS_POINTS
+50
+
+BIRTHDAY_DISCOUNT
+20
+
+BIRTHDAY_VALIDITY_DAYS
+7
+
+WINBACK_THRESHOLD_DAYS
+30
+
+WINBACK_DISCOUNT
+15
+
+WINBACK_VALIDITY_DAYS
+14
+
+=================================================================================
+  AFTER DEPLOYMENT
+=================================================================================
+
+1. Update NEXT_PUBLIC_APP_URL with your actual Vercel URL
+2. Run database migrations: npx prisma migrate deploy
+3. Create admin account: npm run admin:create
+4. Visit: https://your-url.vercel.app/admin/login
+
+=================================================================================
+  OPTIONAL: UPDATE LATER
+=================================================================================
+
+When ready, update these in Vercel Settings > Environment Variables:
+
+- JAZZCASH_NUMBER (your real JazzCash number)
+- EASYPAISA_NUMBER (your real EasyPaisa number)  
+- BANK_ACCOUNT_NUMBER (your real bank account)
+- WHATSAPP_NUMBER (your customer support WhatsApp)
+- Cloudinary credentials (for image uploads)
+
+Then redeploy: Deployments > ... > Redeploy
+
+=================================================================================
