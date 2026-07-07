@@ -44,3 +44,8 @@ prisma/migrations/
 
 # clerk configuration (can include secrets)
 /.clerk/
+
+# whatsapp server
+whatsapp-server/node_modules/
+whatsapp-server/whatsapp-sessions/
+whatsapp-server/.env.local
