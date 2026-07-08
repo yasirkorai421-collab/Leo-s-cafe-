@@ -48,4 +48,11 @@ prisma/migrations/
 # whatsapp server
 whatsapp-server/node_modules/
 whatsapp-server/whatsapp-sessions/
+whatsapp-server/.wwebjs_cache/
 whatsapp-server/.env.local
+whatsapp-server/package-lock.json
+
+# Next.js cache and build artifacts
+.next/cache/**/*.old
+*.pack.old
+*.pack.gz.old
