@@ -30,23 +30,6 @@ export function reportWebVitals(metric: any) {
 }
 
 // ============================================================================
-// LAZY LOADING HELPERS
-// ============================================================================
-
-export function lazyLoadComponent<T extends React.ComponentType<any>>(
-  importFunc: () => Promise<{ default: T }>,
-  fallback?: React.ReactNode
-) {
-  const LazyComponent = React.lazy(importFunc);
-  
-  return (props: React.ComponentProps<T>) => (
-    <React.Suspense fallback={fallback || <div>Loading...</div>}>
-      <LazyComponent {...props} />
-    </React.Suspense>
-  );
-}
-
-// ============================================================================
 // IMAGE OPTIMIZATION
 // ============================================================================
 
@@ -109,19 +92,17 @@ export function throttle<T extends (...args: any[]) => any>(
 // INTERSECTION OBSERVER (LAZY LOADING)
 // ============================================================================
 
-export function useIntersectionObserver(
+export function createIntersectionObserver(
   callback: IntersectionObserverCallback,
   options?: IntersectionObserverInit
-) {
-  const observer = typeof window !== 'undefined'
-    ? new IntersectionObserver(callback, {
-        rootMargin: '50px',
-        threshold: 0.1,
-        ...options,
-      })
-    : null;
-
-  return observer;
+): IntersectionObserver | null {
+  if (typeof window === 'undefined') return null;
+  
+  return new IntersectionObserver(callback, {
+    rootMargin: '50px',
+    threshold: 0.1,
+    ...options,
+  });
 }
 
 // ============================================================================
@@ -193,5 +174,48 @@ export function checkMemoryUsage() {
   }
 }
 
-// Add React import
-import React from 'react';
+// ============================================================================
+// VIEWPORT DETECTION
+// ============================================================================
+
+export function getViewportSize() {
+  if (typeof window === 'undefined') {
+    return { width: 0, height: 0 };
+  }
+  
+  return {
+    width: window.innerWidth,
+    height: window.innerHeight,
+  };
+}
+
+export function isMobileDevice(): boolean {
+  if (typeof window === 'undefined') return false;
+  
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent
+  );
+}
+
+export function isTabletDevice(): boolean {
+  if (typeof window === 'undefined') return false;
+  
+  return /iPad|Android/i.test(navigator.userAgent) && window.innerWidth >= 768;
+}
+
+// ============================================================================
+// PERFORMANCE TIMING
+// ============================================================================
+
+export function measurePerformance(label: string) {
+  if (typeof performance === 'undefined') return () => {};
+  
+  const startTime = performance.now();
+  
+  return () => {
+    const endTime = performance.now();
+    const duration = endTime - startTime;
+    console.log(`[Performance] ${label}: ${duration.toFixed(2)}ms`);
+    return duration;
+  };
+}
