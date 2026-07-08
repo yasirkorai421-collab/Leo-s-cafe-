@@ -1,0 +1,863 @@
+{
+  "timestamp": "2026-07-08T16:22:01.743Z",
+  "summary": {
+    "total": 91,
+    "passed": 36,
+    "failed": 18,
+    "warnings": 37,
+    "passRate": "39.6%"
+  },
+  "categories": {
+    "Empty Input": {
+      "passed": 7,
+      "failed": 0,
+      "warnings": 0
+    },
+    "Boundary Length": {
+      "passed": 8,
+      "failed": 0,
+      "warnings": 0
+    },
+    "Numeric Fields": {
+      "passed": 0,
+      "failed": 0,
+      "warnings": 10
+    },
+    "Phone Number": {
+      "passed": 10,
+      "failed": 7,
+      "warnings": 0
+    },
+    "Email Validation": {
+      "passed": 0,
+      "failed": 0,
+      "warnings": 12
+    },
+    "OTP Validation": {
+      "passed": 8,
+      "failed": 0,
+      "warnings": 0
+    },
+    "Security Injection": {
+      "passed": 0,
+      "failed": 0,
+      "warnings": 12
+    },
+    "Unicode/Emoji": {
+      "passed": 0,
+      "failed": 10,
+      "warnings": 0
+    },
+    "Rate Limiting": {
+      "passed": 0,
+      "failed": 1,
+      "warnings": 0
+    },
+    "Error Handling": {
+      "passed": 3,
+      "failed": 0,
+      "warnings": 0
+    },
+    "Authentication": {
+      "passed": 0,
+      "failed": 0,
+      "warnings": 3
+    }
+  },
+  "tests": [
+    {
+      "category": "Empty Input",
+      "testName": "Completely empty",
+      "status": "pass",
+      "details": "Status: 400, Message: Invalid request",
+      "severity": "high",
+      "timestamp": "2026-07-08T16:21:31.933Z"
+    },
+    {
+      "category": "Empty Input",
+      "testName": "Only whitespace in phone",
+      "status": "pass",
+      "details": "Status: 400, Message: Invalid request",
+      "severity": "high",
+      "timestamp": "2026-07-08T16:21:32.117Z"
+    },
+    {
+      "category": "Empty Input",
+      "testName": "Tab character",
+      "status": "pass",
+      "details": "Status: 400, Message: Invalid request",
+      "severity": "high",
+      "timestamp": "2026-07-08T16:21:32.297Z"
+    },
+    {
+      "category": "Empty Input",
+      "testName": "Newline character",
+      "status": "pass",
+      "details": "Status: 400, Message: Invalid request",
+      "severity": "high",
+      "timestamp": "2026-07-08T16:21:32.479Z"
+    },
+    {
+      "category": "Empty Input",
+      "testName": "Null value",
+      "status": "pass",
+      "details": "Status: 400, Message: Invalid request",
+      "severity": "high",
+      "timestamp": "2026-07-08T16:21:32.855Z"
+    },
+    {
+      "category": "Empty Input",
+      "testName": "Undefined value",
+      "status": "pass",
+      "details": "Status: 400, Message: Invalid request",
+      "severity": "high",
+      "timestamp": "2026-07-08T16:21:33.054Z"
+    },
+    {
+      "category": "Empty Input",
+      "testName": "Empty string",
+      "status": "pass",
+      "details": "Status: 400, Message: Invalid request",
+      "severity": "high",
+      "timestamp": "2026-07-08T16:21:33.230Z"
+    },
+    {
+      "category": "Boundary Length",
+      "testName": "1 character phone",
+      "status": "pass",
+      "details": "Status: 400, Response: {\"error\":\"Invalid request\"}",
+      "severity": "medium",
+      "timestamp": "2026-07-08T16:21:33.855Z"
+    },
+    {
+      "category": "Boundary Length",
+      "testName": "Exactly 11 digits (valid)",
+      "status": "pass",
+      "details": "Status: 400, Response: {\"error\":\"Invalid request\"}",
+      "severity": "medium",
+      "timestamp": "2026-07-08T16:21:34.039Z"
+    },
+    {
+      "category": "Boundary Length",
+      "testName": "Exactly 13 chars with + (valid)",
+      "status": "pass",
+      "details": "Status: 400, Response: {\"error\":\"Invalid request\"}",
+      "severity": "medium",
+      "timestamp": "2026-07-08T16:21:34.290Z"
+    },
+    {
+      "category": "Boundary Length",
+      "testName": "20 digit phone",
+      "status": "pass",
+      "details": "Status: 400, Response: {\"error\":\"Invalid request\"}",
+      "severity": "medium",
+      "timestamp": "2026-07-08T16:21:34.479Z"
+    },
+    {
+      "category": "Boundary Length",
+      "testName": "10,000 char name",
+      "status": "pass",
+      "details": "Status: 400, Response: {\"error\":\"Invalid request\"}",
+      "severity": "medium",
+      "timestamp": "2026-07-08T16:21:34.657Z"
+    },
+    {
+      "category": "Boundary Length",
+      "testName": "Leading whitespace",
+      "status": "pass",
+      "details": "Status: 400, Response: {\"error\":\"Invalid request\"}",
+      "severity": "medium",
+      "timestamp": "2026-07-08T16:21:34.845Z"
+    },
+    {
+      "category": "Boundary Length",
+      "testName": "Trailing whitespace",
+      "status": "pass",
+      "details": "Status: 400, Response: {\"error\":\"Invalid request\"}",
+      "severity": "medium",
+      "timestamp": "2026-07-08T16:21:35.029Z"
+    },
+    {
+      "category": "Boundary Length",
+      "testName": "Spaces in middle",
+      "status": "pass",
+      "details": "Status: 400, Response: {\"error\":\"Invalid request\"}",
+      "severity": "medium",
+      "timestamp": "2026-07-08T16:21:35.201Z"
+    },
+    {
+      "category": "Numeric Fields",
+      "testName": "Zero quantity",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "low",
+      "timestamp": "2026-07-08T16:21:35.396Z"
+    },
+    {
+      "category": "Numeric Fields",
+      "testName": "Negative quantity",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "low",
+      "timestamp": "2026-07-08T16:21:35.613Z"
+    },
+    {
+      "category": "Numeric Fields",
+      "testName": "Decimal quantity",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "low",
+      "timestamp": "2026-07-08T16:21:35.855Z"
+    },
+    {
+      "category": "Numeric Fields",
+      "testName": "Huge number",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "low",
+      "timestamp": "2026-07-08T16:21:36.134Z"
+    },
+    {
+      "category": "Numeric Fields",
+      "testName": "Text in quantity",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "low",
+      "timestamp": "2026-07-08T16:21:36.383Z"
+    },
+    {
+      "category": "Numeric Fields",
+      "testName": "Scientific notation",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "low",
+      "timestamp": "2026-07-08T16:21:36.730Z"
+    },
+    {
+      "category": "Numeric Fields",
+      "testName": "Leading zeros",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "low",
+      "timestamp": "2026-07-08T16:21:36.965Z"
+    },
+    {
+      "category": "Numeric Fields",
+      "testName": "Comma formatted",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "low",
+      "timestamp": "2026-07-08T16:21:37.217Z"
+    },
+    {
+      "category": "Numeric Fields",
+      "testName": "NaN value",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "low",
+      "timestamp": "2026-07-08T16:21:37.478Z"
+    },
+    {
+      "category": "Numeric Fields",
+      "testName": "Infinity value",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "low",
+      "timestamp": "2026-07-08T16:21:38.493Z"
+    },
+    {
+      "category": "Phone Number",
+      "testName": "Valid Pakistani +92",
+      "status": "fail",
+      "details": "Expected ACCEPT, Got REJECT (400)",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:40.321Z"
+    },
+    {
+      "category": "Phone Number",
+      "testName": "Valid without +",
+      "status": "fail",
+      "details": "Expected ACCEPT, Got REJECT (400)",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:40.643Z"
+    },
+    {
+      "category": "Phone Number",
+      "testName": "Valid without leading 0",
+      "status": "fail",
+      "details": "Expected ACCEPT, Got REJECT (400)",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:40.816Z"
+    },
+    {
+      "category": "Phone Number",
+      "testName": "With spaces",
+      "status": "fail",
+      "details": "Expected ACCEPT, Got REJECT (400)",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:41.012Z"
+    },
+    {
+      "category": "Phone Number",
+      "testName": "With dashes",
+      "status": "fail",
+      "details": "Expected ACCEPT, Got REJECT (400)",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:41.366Z"
+    },
+    {
+      "category": "Phone Number",
+      "testName": "With parentheses",
+      "status": "fail",
+      "details": "Expected ACCEPT, Got REJECT (400)",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:41.539Z"
+    },
+    {
+      "category": "Phone Number",
+      "testName": "Landline (rejected)",
+      "status": "pass",
+      "details": "Expected REJECT, Got REJECT (400)",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:41.716Z"
+    },
+    {
+      "category": "Phone Number",
+      "testName": "US number",
+      "status": "pass",
+      "details": "Expected REJECT, Got REJECT (400)",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:41.889Z"
+    },
+    {
+      "category": "Phone Number",
+      "testName": "Too short",
+      "status": "pass",
+      "details": "Expected REJECT, Got REJECT (400)",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:42.066Z"
+    },
+    {
+      "category": "Phone Number",
+      "testName": "Too long",
+      "status": "pass",
+      "details": "Expected REJECT, Got REJECT (400)",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:42.232Z"
+    },
+    {
+      "category": "Phone Number",
+      "testName": "Contains letters",
+      "status": "pass",
+      "details": "Expected REJECT, Got REJECT (400)",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:42.402Z"
+    },
+    {
+      "category": "Phone Number",
+      "testName": "Double plus",
+      "status": "pass",
+      "details": "Expected REJECT, Got REJECT (400)",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:42.579Z"
+    },
+    {
+      "category": "Phone Number",
+      "testName": "Missing + with 92",
+      "status": "fail",
+      "details": "Expected ACCEPT, Got REJECT (400)",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:42.749Z"
+    },
+    {
+      "category": "Phone Number",
+      "testName": "SQL injection attempt",
+      "status": "pass",
+      "details": "Expected REJECT, Got REJECT (400)",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:42.937Z"
+    },
+    {
+      "category": "Phone Number",
+      "testName": "XSS in phone",
+      "status": "pass",
+      "details": "Expected REJECT, Got REJECT (400)",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:43.113Z"
+    },
+    {
+      "category": "Phone Number",
+      "testName": "Arabic-Indic digits",
+      "status": "pass",
+      "details": "Expected REJECT, Got REJECT (400)",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:43.279Z"
+    },
+    {
+      "category": "Phone Number",
+      "testName": "Emoji in phone",
+      "status": "pass",
+      "details": "Expected REJECT, Got REJECT (400)",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:43.449Z"
+    },
+    {
+      "category": "Email Validation",
+      "testName": "Valid standard email",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "medium",
+      "timestamp": "2026-07-08T16:21:44.179Z"
+    },
+    {
+      "category": "Email Validation",
+      "testName": "Email with plus tag",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "medium",
+      "timestamp": "2026-07-08T16:21:44.327Z"
+    },
+    {
+      "category": "Email Validation",
+      "testName": "Email with subdomain",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "medium",
+      "timestamp": "2026-07-08T16:21:44.473Z"
+    },
+    {
+      "category": "Email Validation",
+      "testName": "Missing @",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "medium",
+      "timestamp": "2026-07-08T16:21:44.619Z"
+    },
+    {
+      "category": "Email Validation",
+      "testName": "Missing domain",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "medium",
+      "timestamp": "2026-07-08T16:21:44.755Z"
+    },
+    {
+      "category": "Email Validation",
+      "testName": "Missing local part",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "medium",
+      "timestamp": "2026-07-08T16:21:45.024Z"
+    },
+    {
+      "category": "Email Validation",
+      "testName": "Multiple @",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "medium",
+      "timestamp": "2026-07-08T16:21:45.448Z"
+    },
+    {
+      "category": "Email Validation",
+      "testName": "Trailing dot",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "medium",
+      "timestamp": "2026-07-08T16:21:45.592Z"
+    },
+    {
+      "category": "Email Validation",
+      "testName": "Unicode domain",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "medium",
+      "timestamp": "2026-07-08T16:21:45.750Z"
+    },
+    {
+      "category": "Email Validation",
+      "testName": "Very long email",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "medium",
+      "timestamp": "2026-07-08T16:21:45.893Z"
+    },
+    {
+      "category": "Email Validation",
+      "testName": "Whitespace in email",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "medium",
+      "timestamp": "2026-07-08T16:21:46.059Z"
+    },
+    {
+      "category": "Email Validation",
+      "testName": "Case sensitivity",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "medium",
+      "timestamp": "2026-07-08T16:21:46.208Z"
+    },
+    {
+      "category": "OTP Validation",
+      "testName": "Correct format",
+      "status": "pass",
+      "details": "Status: 400, Response: Invalid request",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:47.143Z"
+    },
+    {
+      "category": "OTP Validation",
+      "testName": "With leading zero",
+      "status": "pass",
+      "details": "Status: 400, Response: Invalid request",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:47.190Z"
+    },
+    {
+      "category": "OTP Validation",
+      "testName": "With whitespace",
+      "status": "pass",
+      "details": "Status: 400, Response: Invalid request",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:47.232Z"
+    },
+    {
+      "category": "OTP Validation",
+      "testName": "With letter",
+      "status": "pass",
+      "details": "Status: 400, Response: Invalid request",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:47.277Z"
+    },
+    {
+      "category": "OTP Validation",
+      "testName": "Too short",
+      "status": "pass",
+      "details": "Status: 400, Response: Invalid request",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:47.322Z"
+    },
+    {
+      "category": "OTP Validation",
+      "testName": "Too long",
+      "status": "pass",
+      "details": "Status: 400, Response: Invalid request",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:47.366Z"
+    },
+    {
+      "category": "OTP Validation",
+      "testName": "Empty OTP",
+      "status": "pass",
+      "details": "Status: 400, Response: Invalid request",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:47.514Z"
+    },
+    {
+      "category": "OTP Validation",
+      "testName": "Null OTP",
+      "status": "pass",
+      "details": "Status: 400, Response: Invalid request",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:47.579Z"
+    },
+    {
+      "category": "Security Injection",
+      "testName": "XSS Script tag",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:48.001Z"
+    },
+    {
+      "category": "Security Injection",
+      "testName": "XSS Image onerror",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:48.397Z"
+    },
+    {
+      "category": "Security Injection",
+      "testName": "XSS Event handler",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:48.640Z"
+    },
+    {
+      "category": "Security Injection",
+      "testName": "SQL injection DROP",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:48.878Z"
+    },
+    {
+      "category": "Security Injection",
+      "testName": "SQL injection OR",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:49.117Z"
+    },
+    {
+      "category": "Security Injection",
+      "testName": "Template injection (Jinja)",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:49.361Z"
+    },
+    {
+      "category": "Security Injection",
+      "testName": "Template injection (JS)",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:50.165Z"
+    },
+    {
+      "category": "Security Injection",
+      "testName": "Path traversal",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:51.946Z"
+    },
+    {
+      "category": "Security Injection",
+      "testName": "Null byte",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:52.987Z"
+    },
+    {
+      "category": "Security Injection",
+      "testName": "LDAP injection",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:54.004Z"
+    },
+    {
+      "category": "Security Injection",
+      "testName": "Command injection",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:54.244Z"
+    },
+    {
+      "category": "Security Injection",
+      "testName": "NoSQL injection",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:54.481Z"
+    },
+    {
+      "category": "Unicode/Emoji",
+      "testName": "Emoji in name",
+      "status": "fail",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "medium",
+      "timestamp": "2026-07-08T16:21:54.732Z"
+    },
+    {
+      "category": "Unicode/Emoji",
+      "testName": "Arabic text",
+      "status": "fail",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "medium",
+      "timestamp": "2026-07-08T16:21:54.970Z"
+    },
+    {
+      "category": "Unicode/Emoji",
+      "testName": "Urdu text",
+      "status": "fail",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "medium",
+      "timestamp": "2026-07-08T16:21:55.203Z"
+    },
+    {
+      "category": "Unicode/Emoji",
+      "testName": "Chinese text",
+      "status": "fail",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "medium",
+      "timestamp": "2026-07-08T16:21:55.431Z"
+    },
+    {
+      "category": "Unicode/Emoji",
+      "testName": "Japanese text",
+      "status": "fail",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "medium",
+      "timestamp": "2026-07-08T16:21:55.671Z"
+    },
+    {
+      "category": "Unicode/Emoji",
+      "testName": "Russian text",
+      "status": "fail",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "medium",
+      "timestamp": "2026-07-08T16:21:55.909Z"
+    },
+    {
+      "category": "Unicode/Emoji",
+      "testName": "Mixed RTL+LTR",
+      "status": "fail",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "medium",
+      "timestamp": "2026-07-08T16:21:56.154Z"
+    },
+    {
+      "category": "Unicode/Emoji",
+      "testName": "Zero-width chars",
+      "status": "fail",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "medium",
+      "timestamp": "2026-07-08T16:21:56.388Z"
+    },
+    {
+      "category": "Unicode/Emoji",
+      "testName": "Full-width chars",
+      "status": "fail",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "medium",
+      "timestamp": "2026-07-08T16:21:56.624Z"
+    },
+    {
+      "category": "Unicode/Emoji",
+      "testName": "Combining diacritics",
+      "status": "fail",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "medium",
+      "timestamp": "2026-07-08T16:21:56.862Z"
+    },
+    {
+      "category": "Rate Limiting",
+      "testName": "OTP send rate limit",
+      "status": "fail",
+      "details": "5 requests: 0 allowed, 0 blocked. NO RATE LIMIT DETECTED!",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:22:00.500Z"
+    },
+    {
+      "category": "Error Handling",
+      "testName": "Unauthorized admin access",
+      "status": "pass",
+      "details": "Status: 200, Safe error message",
+      "severity": "medium",
+      "timestamp": "2026-07-08T16:22:00.730Z"
+    },
+    {
+      "category": "Error Handling",
+      "testName": "Non-existent endpoint",
+      "status": "pass",
+      "details": "Status: 200, Safe error message",
+      "severity": "medium",
+      "timestamp": "2026-07-08T16:22:00.970Z"
+    },
+    {
+      "category": "Error Handling",
+      "testName": "Malformed JSON",
+      "status": "pass",
+      "details": "Status: 400, Safe error message",
+      "severity": "medium",
+      "timestamp": "2026-07-08T16:22:01.010Z"
+    },
+    {
+      "category": "Authentication",
+      "testName": "Protected route without token",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "high",
+      "timestamp": "2026-07-08T16:22:01.246Z"
+    },
+    {
+      "category": "Authentication",
+      "testName": "Protected route with invalid token",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "high",
+      "timestamp": "2026-07-08T16:22:01.493Z"
+    },
+    {
+      "category": "Authentication",
+      "testName": "Admin route from regular user",
+      "status": "warn",
+      "details": "Error: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "severity": "high",
+      "timestamp": "2026-07-08T16:22:01.739Z"
+    }
+  ],
+  "criticalFailures": [
+    {
+      "category": "Phone Number",
+      "testName": "Valid Pakistani +92",
+      "status": "fail",
+      "details": "Expected ACCEPT, Got REJECT (400)",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:40.321Z"
+    },
+    {
+      "category": "Phone Number",
+      "testName": "Valid without +",
+      "status": "fail",
+      "details": "Expected ACCEPT, Got REJECT (400)",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:40.643Z"
+    },
+    {
+      "category": "Phone Number",
+      "testName": "Valid without leading 0",
+      "status": "fail",
+      "details": "Expected ACCEPT, Got REJECT (400)",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:40.816Z"
+    },
+    {
+      "category": "Phone Number",
+      "testName": "With spaces",
+      "status": "fail",
+      "details": "Expected ACCEPT, Got REJECT (400)",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:41.012Z"
+    },
+    {
+      "category": "Phone Number",
+      "testName": "With dashes",
+      "status": "fail",
+      "details": "Expected ACCEPT, Got REJECT (400)",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:41.366Z"
+    },
+    {
+      "category": "Phone Number",
+      "testName": "With parentheses",
+      "status": "fail",
+      "details": "Expected ACCEPT, Got REJECT (400)",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:41.539Z"
+    },
+    {
+      "category": "Phone Number",
+      "testName": "Missing + with 92",
+      "status": "fail",
+      "details": "Expected ACCEPT, Got REJECT (400)",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:21:42.749Z"
+    },
+    {
+      "category": "Rate Limiting",
+      "testName": "OTP send rate limit",
+      "status": "fail",
+      "details": "5 requests: 0 allowed, 0 blocked. NO RATE LIMIT DETECTED!",
+      "severity": "critical",
+      "timestamp": "2026-07-08T16:22:00.500Z"
+    }
+  ]
+}
