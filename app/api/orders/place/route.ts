@@ -4,7 +4,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { createServerClient } from '@/utils/supabase/server';
+import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 
@@ -14,13 +14,16 @@ const placeOrderSchema = z.object({
     name: z.string(),
     price: z.number(),
     quantity: z.number(),
+    customization: z.any().optional(),
   })),
   totalPrice: z.number().positive(),
+  deliveryAddress: z.string().optional(),
+  customerNotes: z.string().optional(),
 });
 
 export async function POST(req: Request) {
   try {
-    const supabase = await createServerClient();
+    const supabase = await createClient();
     
     // Get current user
     const { data: { user } } = await supabase.auth.getUser();
@@ -41,28 +44,49 @@ export async function POST(req: Request) {
     const body = await req.json();
     const validation = placeOrderSchema.safeParse(body);
     if (!validation.success) {
-      return NextResponse.json({ error: 'Invalid order data' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid order data', details: validation.error }, { status: 400 });
     }
 
-    const { items, totalPrice } = validation.data;
+    const { items, totalPrice, deliveryAddress, customerNotes } = validation.data;
 
     // Get user profile to check phone verification
     const userProfile = await prisma.user.findUnique({
       where: { id: user.id },
+      select: {
+        id: true,
+        name: true,
+        phone: true,
+        phoneVerified: true,
+      },
     });
 
     if (!userProfile) {
       return NextResponse.json({ error: 'User profile not found' }, { status: 404 });
     }
 
-    // Create order
+    // Create order with order items
     const order = await prisma.order.create({
       data: {
         userId: user.id,
-        items: items,
-        totalPrice: parseFloat(totalPrice.toString()),
+        total: parseFloat(totalPrice.toString()),
         status: userProfile.phoneVerified ? 'confirmed' : 'pending_whatsapp_confirmation',
-        phoneVerified: userProfile.phoneVerified || false,
+        deliveryAddress,
+        customerNotes,
+        orderItems: {
+          create: items.map((item) => ({
+            itemId: item.id,
+            quantity: item.quantity,
+            itemPrice: item.price,
+            customization: item.customization || null,
+          })),
+        },
+      },
+      include: {
+        orderItems: {
+          include: {
+            item: true,
+          },
+        },
       },
     });
 
@@ -100,7 +124,14 @@ export async function POST(req: Request) {
       order: {
         id: order.id,
         status: order.status,
+        total: order.total,
         needsWhatsAppConfirmation: !userProfile.phoneVerified,
+        items: order.orderItems.map((oi) => ({
+          id: oi.itemId,
+          name: oi.item.name,
+          quantity: oi.quantity,
+          price: oi.itemPrice,
+        })),
       },
     });
   } catch (error) {

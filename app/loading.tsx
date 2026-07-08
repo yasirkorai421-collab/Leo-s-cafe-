@@ -1,9 +1,18 @@
 export default function Loading() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-white">
       <div className="text-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary mx-auto mb-4"></div>
-        <p className="text-gray-600">Loading Leo's Cafe...</p>
+        {/* Animated Logo Spinner */}
+        <div className="mb-4 inline-block">
+          <div className="w-16 h-16 border-4 border-orange-200 border-t-orange-600 rounded-full animate-spin"></div>
+        </div>
+        
+        <h2 className="text-xl font-semibold text-gray-800 mb-2">
+          Loading...
+        </h2>
+        <p className="text-gray-500 text-sm">
+          Please wait while we prepare your experience
+        </p>
       </div>
     </div>
   );

@@ -4,7 +4,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { createServerClient } from '@/utils/supabase/server';
+import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
 
 export async function GET(
@@ -12,7 +12,7 @@ export async function GET(
   { params }: { params: { orderId: string } }
 ) {
   try {
-    const supabase = await createServerClient();
+    const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
@@ -24,6 +24,13 @@ export async function GET(
     // Get order and verify ownership
     const order = await prisma.order.findUnique({
       where: { id: orderId },
+      include: {
+        orderItems: {
+          include: {
+            item: true,
+          },
+        },
+      },
     });
 
     if (!order || order.userId !== user.id) {
@@ -33,9 +40,13 @@ export async function GET(
     return NextResponse.json({
       id: order.id,
       status: order.status,
-      items: order.items,
-      totalPrice: order.totalPrice,
-      phoneVerified: order.phoneVerified,
+      items: order.orderItems.map((oi) => ({
+        id: oi.itemId,
+        name: oi.item.name,
+        quantity: oi.quantity,
+        price: oi.itemPrice,
+      })),
+      totalPrice: order.total,
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
     });

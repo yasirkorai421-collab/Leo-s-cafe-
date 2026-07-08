@@ -30,6 +30,8 @@ model User {
   email           String?
   role            UserRole  @default(user)
   phoneVerifiedAt DateTime? @map("phone_verified_at")
+  phoneVerified   Boolean   @default(false) @map("phone_verified") // WhatsApp verification status
+  emailVerified   Boolean   @default(false) @map("email_verified") // Email verification status
   birthday        DateTime? // For birthday rewards & notifications
   birthdayNotificationSent DateTime? @map("birthday_notification_sent") // Track if notification sent this year
   googleReviewSubmitted Boolean @default(false) @map("google_review_submitted") // Track if user submitted Google review
@@ -54,6 +56,14 @@ model User {
   auditLogs           AuditLog[]
   reservations        Reservation[]
 
+  // Performance indexes
+  @@index([phone])
+  @@index([email])
+  @@index([role])
+  @@index([phoneVerified])
+  @@index([lastOrderAt])
+  @@index([birthday])
+  @@index([createdAt])
   @@map("users")
 }
 
@@ -67,6 +77,9 @@ model OtpChallenge {
   createdAt    DateTime  @default(now()) @map("created_at")
 
   @@map("otp_challenges")
+  @@index([phone])
+  @@index([expiresAt])
+  @@index([lockUntil])
 }
 
 // ============================================================================
@@ -86,6 +99,9 @@ model Category {
   // Relations
   menuItems MenuItem[]
 
+  @@index([slug])
+  @@index([isActive])
+  @@index([sortOrder])
   @@map("categories")
 }
 
@@ -113,6 +129,12 @@ model MenuItem {
   reviews         Review[]
   favorites       Favorite[]
 
+  @@index([categoryId])
+  @@index([slug])
+  @@index([isActive])
+  @@index([isAvailable])
+  @@index([createdAt])
+  @@index([ratingsAvg])
   @@map("menu_items")
 }
 
@@ -136,16 +158,18 @@ model Customization {
 // ============================================================================
 
 enum OrderStatus {
-  pending_payment      // Waiting for payment method selection
-  payment_cod          // Cash on Delivery selected
-  payment_online       // Online payment screenshot uploaded
-  confirmed            // Admin verified payment
-  preparing            // Kitchen is preparing
-  ready                // Ready for pickup/delivery
-  picked_up            // Delivery person picked up the order
-  out_for_delivery     // Delivery person is on the way
-  delivered            // Completed
-  cancelled            // Cancelled
+  pending_payment                // Waiting for payment method selection
+  pending_whatsapp_confirmation  // Waiting for WhatsApp confirmation
+  payment_cod                    // Cash on Delivery selected
+  payment_online                 // Online payment screenshot uploaded
+  confirmed                      // Admin verified payment
+  preparing                      // Kitchen is preparing
+  ready                          // Ready for pickup/delivery
+  picked_up                      // Delivery person picked up the order
+  out_for_delivery               // Delivery person is on the way
+  delivered                      // Completed
+  cancelled                      // Cancelled
+  expired                        // WhatsApp confirmation expired
 }
 
 enum PaymentMethod {
@@ -190,6 +214,12 @@ model Order {
   tableSession   TableSession?  @relation(fields: [tableSessionId], references: [id], onDelete: SetNull) // CLAUDE.md rule 16
   voucherUsed    Voucher?       @relation("VoucherUsed")
 
+  @@index([userId])
+  @@index([status])
+  @@index([paymentStatus])
+  @@index([deliveryPersonId])
+  @@index([createdAt])
+  @@index([orderType])
   @@map("orders")
 }
 
@@ -205,6 +235,8 @@ model OrderItem {
   order Order    @relation(fields: [orderId], references: [id], onDelete: Cascade) // CLAUDE.md rule 16: cascade delete with order
   item  MenuItem @relation(fields: [itemId], references: [id], onDelete: Restrict) // CLAUDE.md rule 16: preserve history
 
+  @@index([orderId])
+  @@index([itemId])
   @@map("order_items")
 }
 
@@ -227,6 +259,9 @@ model PaymentProof {
   order    Order  @relation(fields: [orderId], references: [id], onDelete: Cascade) // CLAUDE.md rule 16
   verifier User?  @relation("VerifiedBy", fields: [verifiedBy], references: [id], onDelete: SetNull) // CLAUDE.md rule 16
 
+  @@index([orderId])
+  @@index([status])
+  @@index([uploadedAt])
   @@map("payment_proofs")
 }
 
@@ -246,6 +281,10 @@ model Review {
   user User     @relation(fields: [userId], references: [id], onDelete: Cascade) // CLAUDE.md rule 16
   item MenuItem @relation(fields: [itemId], references: [id], onDelete: Restrict) // CLAUDE.md rule 16
 
+  @@index([userId])
+  @@index([itemId])
+  @@index([rating])
+  @@index([createdAt])
   @@map("reviews")
 }
 
@@ -280,6 +319,11 @@ model Offer {
   creator User  @relation("CreatedBy", fields: [createdBy], references: [id], onDelete: Restrict) // CLAUDE.md rule 16
   updater User? @relation("UpdatedBy", fields: [updatedBy], references: [id], onDelete: SetNull) // CLAUDE.md rule 16
 
+  @@index([isActive])
+  @@index([isFeatured])
+  @@index([code])
+  @@index([startsAt])
+  @@index([endsAt])
   @@map("offers")
 }
 
@@ -306,6 +350,10 @@ model LoyaltyLedger {
   user    User  @relation("LoyaltyUser", fields: [userId], references: [id], onDelete: Cascade) // CLAUDE.md rule 16
   creator User? @relation("LoyaltyCreator", fields: [createdBy], references: [id], onDelete: SetNull) // CLAUDE.md rule 16 (self-referencing)
 
+  @@index([userId])
+  @@index([orderId])
+  @@index([type])
+  @@index([createdAt])
   @@map("loyalty_ledger")
 }
 
@@ -339,6 +387,11 @@ model Voucher {
   user  User   @relation(fields: [userId], references: [id], onDelete: Cascade) // CLAUDE.md rule 16
   order Order? @relation("VoucherUsed", fields: [usedOnOrderId], references: [id], onDelete: SetNull) // CLAUDE.md rule 16
 
+  @@index([userId])
+  @@index([code])
+  @@index([status])
+  @@index([type])
+  @@index([expiresAt])
   @@map("vouchers")
 }
 
@@ -361,6 +414,9 @@ model ReviewPointClaim {
   user     User  @relation("ClaimUser", fields: [userId], references: [id], onDelete: Cascade) // CLAUDE.md rule 16
   reviewer User? @relation("ClaimReviewer", fields: [reviewedBy], references: [id], onDelete: SetNull) // CLAUDE.md rule 16 (self-referencing)
 
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
   @@map("review_point_claims")
 }
 
@@ -380,6 +436,8 @@ model Table {
   // Relations
   sessions TableSession[]
 
+  @@index([qrToken])
+  @@index([isActive])
   @@map("tables")
 }
 
@@ -405,6 +463,9 @@ model TableSession {
   // CLAUDE.md rule 12: DB-level uniqueness constraint for one active session per table
   @@unique([tableId, status], name: "unique_active_session_per_table", map: "unique_active_session")
   @@index([sessionToken])
+  @@index([status])
+  @@index([tableId])
+  @@index([expiresAt])
   @@map("table_sessions")
 }
 
@@ -455,6 +516,10 @@ model Reservation {
   // Relations
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
+  @@index([status])
+  @@index([date])
+  @@index([createdAt])
   @@map("reservations")
 }
 
@@ -481,6 +546,9 @@ model Story {
   createdAt   DateTime    @default(now()) @map("created_at")
   updatedAt   DateTime    @updatedAt @map("updated_at")
 
+  @@index([status])
+  @@index([isActive])
+  @@index([sortOrder])
   @@map("stories")
 }
 
@@ -500,6 +568,11 @@ model AuditLog {
   // Relations
   user User @relation(fields: [userId], references: [id], onDelete: Restrict) // CLAUDE.md rule 16
 
+  @@index([userId])
+  @@index([action])
+  @@index([entityType])
+  @@index([entityId])
+  @@index([createdAt])
   @@map("audit_log")
 }
 
