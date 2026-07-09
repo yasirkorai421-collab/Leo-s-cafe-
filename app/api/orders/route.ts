@@ -6,23 +6,63 @@
 
 import { NextResponse } from "next/server";
 import { createOrderSchema } from "@/schemas/checkout";
-import { getCurrentUser } from "@/lib/ownership";
+import { createClient } from "@/utils/supabase/server";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
   try {
-    // Auth check
-    const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // Auth check - inline with debug info
+    const supabase = await createClient();
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+
+    if (!authUser) {
+      return NextResponse.json(
+        { error: "Unauthorized", details: "Supabase auth returned no user. You may not be logged in." },
+        { status: 401 }
+      );
+    }
+
+    // Look up user in database
+    const dbUser = await prisma.user.findUnique({
+      where: { clerkId: authUser.id },
+      select: { id: true, role: true },
+    });
+
+    if (!dbUser) {
+      // User is authenticated with Supabase but has no database record
+      // Auto-create the user record
+      const name = authUser.user_metadata?.full_name || 
+                   authUser.user_metadata?.name || 
+                   authUser.email?.split('@')[0] || 
+                   'User';
+      const phone = authUser.user_metadata?.phone || authUser.phone || authUser.id;
+
+      const newUser = await prisma.user.create({
+        data: {
+          clerkId: authUser.id,
+          name,
+          phone,
+          email: authUser.email,
+          role: 'user',
+        },
+        select: { id: true, role: true },
+      });
+
+      // Use the newly created user
+      var userId = newUser.id;
+      var isAdmin = newUser.role === "admin";
+    } else {
+      var userId = dbUser.id;
+      var isAdmin = dbUser.role === "admin";
     }
 
     const body = await request.json();
     const validation = createOrderSchema.safeParse(body);
 
     if (!validation.success) {
+      const messages = validation.error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join('; ');
       return NextResponse.json(
-        { error: "Invalid input", details: validation.error.issues },
+        { error: "Invalid input", details: messages },
         { status: 400 }
       );
     }
@@ -34,21 +74,31 @@ export async function POST(request: Request) {
       where: {
         id: { in: items.map((i) => i.itemId) },
         isActive: true,
-        isAvailable: true,
       },
-      select: { id: true, price: true, name: true },
+      select: { id: true, price: true, name: true, isAvailable: true },
     });
 
     if (menuItems.length !== items.length) {
+      const foundIds = menuItems.map(m => m.id);
+      const missingIds = items.filter(i => !foundIds.includes(i.itemId)).map(i => i.itemId);
       return NextResponse.json(
-        { error: "Some items are not available" },
+        { error: "Some items are not available", details: `Missing items: ${missingIds.join(', ')}` },
+        { status: 400 }
+      );
+    }
+
+    // Check if any items are marked as unavailable
+    const unavailableItems = menuItems.filter(m => !m.isAvailable);
+    if (unavailableItems.length > 0) {
+      return NextResponse.json(
+        { error: "Some items are currently unavailable", details: `Unavailable: ${unavailableItems.map(i => i.name).join(', ')}` },
         { status: 400 }
       );
     }
 
     // Calculate total from database prices
     let total = 0;
-    const orderItems = items.map((cartItem) => {
+    const orderItemsToCreate = items.map((cartItem) => {
       const menuItem = menuItems.find((m) => m.id === cartItem.itemId);
       if (!menuItem) throw new Error("Item not found");
 
@@ -56,23 +106,26 @@ export async function POST(request: Request) {
       total += itemTotal;
 
       return {
-        item: { connect: { id: cartItem.itemId } },
+        itemId: cartItem.itemId,
         quantity: cartItem.quantity,
-        customization: (cartItem.customizations || {}) as any,
+        customization: cartItem.customizations ? cartItem.customizations : undefined,
         itemPrice: menuItem.price,
       };
     });
 
+    const finalNotes = `Name: ${name}\nPhone: ${phone}\nNotes: ${notes || "None"}`;
+
     // Create order with order items
     const order = await prisma.order.create({
       data: {
-        userId: user.userId,
+        userId: userId,
         status: "pending_payment",
         paymentStatus: "pending",
         total,
         deliveryAddress,
+        customerNotes: finalNotes,
         orderItems: {
-          create: orderItems,
+          create: orderItemsToCreate,
         },
       },
       include: {
@@ -88,7 +141,7 @@ export async function POST(request: Request) {
 
     // Update user's lastOrderAt for win-back engine (Epic 5)
     await prisma.user.update({
-      where: { id: user.userId },
+      where: { id: userId },
       data: { lastOrderAt: new Date() },
     });
 
@@ -96,7 +149,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("Order creation error:", error);
     return NextResponse.json(
-      { error: "Failed to create order" },
+      { error: "Failed to create order", details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }

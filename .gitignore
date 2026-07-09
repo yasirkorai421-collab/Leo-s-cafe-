@@ -57,3 +57,7 @@ whatsapp-server/package-lock.json
 .next/cache/**/*.old
 *.pack.old
 *.pack.gz.old
+
+# Documentation files - no .md files on GitHub except README.md
+*.md
+!README.md
