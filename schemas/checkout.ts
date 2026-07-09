@@ -11,7 +11,7 @@ import { phoneSchema } from "./auth";
 export const checkoutSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").max(100),
   phone: phoneSchema,
-  deliveryAddress: z.string().min(10, "Please provide a complete address").max(500),
+  deliveryAddress: z.string().min(5, "Please provide a complete address").max(500),
   notes: z.string().max(500).optional(),
 });
 
@@ -21,7 +21,7 @@ export type CheckoutInput = z.infer<typeof checkoutSchema>;
 export const createOrderSchema = checkoutSchema.extend({
   items: z.array(
     z.object({
-      itemId: z.string().uuid(),
+      itemId: z.string().min(1, "Invalid item ID"),
       quantity: z.number().int().min(1),
       customizations: z.record(z.string(), z.unknown()).optional(),
     })

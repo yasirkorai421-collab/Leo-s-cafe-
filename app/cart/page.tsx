@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
+import ClearOldCartItems from "./clear-old-items";
 
 export default function CartPage() {
   const router = useRouter();
@@ -103,6 +104,7 @@ export default function CartPage() {
 
   return (
     <div className="min-h-screen bg-background py-8">
+      <ClearOldCartItems />
       <div className="container mx-auto px-4 max-w-6xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">

@@ -6,14 +6,17 @@ import { useCart } from "@/store/cart";
 import { toast } from "react-hot-toast";
 
 interface MenuItem {
+  id?: string; // Database ID (UUID)
   name: string;
   description: string;
-  price: string;
+  price: string | number;
   priceSmall?: string;
   priceMedium?: string;
   priceLarge?: string;
-  img: string;
+  img?: string;
+  imageUrl?: string;
   badge?: string;
+  isAvailable?: boolean;
 }
 
 interface MenuDisplayProps {
@@ -37,8 +40,8 @@ export default function MenuDisplay({ categories, menuData }: MenuDisplayProps) 
       return;
     }
 
-    // For pizzas, show size selector if size not provided
-    if (isPizzaTab && !size) {
+    // For pizzas with separate size pricing, show size selector if size not provided
+    if (isPizzaTab && item.priceSmall && !size) {
       setSelectedItem(item);
       setSelectedSize('medium');
       setShowSizeModal(true);
@@ -49,7 +52,7 @@ export default function MenuDisplay({ categories, menuData }: MenuDisplayProps) 
     let priceValue = 0;
     let sizeLabel = '';
     
-    if (isPizzaTab && size) {
+    if (isPizzaTab && size && item.priceSmall) {
       if (size === 'small') {
         priceValue = parseInt(item.priceSmall?.replace(/[^0-9]/g, '') || '0');
         sizeLabel = 'Small';
@@ -61,7 +64,12 @@ export default function MenuDisplay({ categories, menuData }: MenuDisplayProps) 
         sizeLabel = 'Large';
       }
     } else {
-      priceValue = parseInt(item.price.replace(/[^0-9]/g, '') || '0');
+      // Handle both string "Rs. 250" and number 250
+      if (typeof item.price === 'number') {
+        priceValue = item.price;
+      } else {
+        priceValue = parseInt(item.price.replace(/[^0-9]/g, '') || '0');
+      }
     }
 
     if (priceValue === 0) {
@@ -70,10 +78,10 @@ export default function MenuDisplay({ categories, menuData }: MenuDisplayProps) 
     }
 
     addItem({
-      itemId: `${item.name}-${size || 'regular'}`,
-      name: size ? `${item.name} (${sizeLabel})` : item.name,
+      itemId: item.id || `${item.name}-${size || 'regular'}`,
+      name: size && sizeLabel ? `${item.name} (${sizeLabel})` : item.name,
       price: priceValue,
-      imageUrl: item.img,
+      imageUrl: item.imageUrl || item.img || '',
       quantity: 1,
       customizations: size ? { size } : undefined,
     });
@@ -174,7 +182,7 @@ export default function MenuDisplay({ categories, menuData }: MenuDisplayProps) 
                     {/* Food photo */}
                     <div className="w-24 h-24 sm:w-28 sm:h-28 flex-shrink-0 overflow-hidden rounded-full relative mx-auto sm:mx-0">
                       <Image
-                        src={item.img}
+                        src={item.imageUrl || item.img || '/placeholder.jpg'}
                         alt={item.name}
                         fill
                         sizes="(max-width: 640px) 96px, 112px"
@@ -209,7 +217,7 @@ export default function MenuDisplay({ categories, menuData }: MenuDisplayProps) 
                               className="font-bold text-xl"
                               style={{ color: "var(--color-accent)" }}
                             >
-                              {item.price}
+                              {typeof item.price === 'number' ? `Rs. ${item.price}` : item.price}
                             </span>
                           )}
                         </div>
@@ -287,7 +295,7 @@ export default function MenuDisplay({ categories, menuData }: MenuDisplayProps) 
 
             <div className="mb-6 relative h-48 rounded-lg overflow-hidden">
               <Image
-                src={selectedItem.img}
+                src={selectedItem.imageUrl || selectedItem.img || '/placeholder.jpg'}
                 alt={selectedItem.name}
                 fill
                 sizes="(max-width: 768px) 100vw, 400px"

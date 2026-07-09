@@ -145,7 +145,17 @@ export async function POST(request: Request) {
       data: { lastOrderAt: new Date() },
     });
 
-    return NextResponse.json({ order }, { status: 201 });
+    // Convert Decimal fields to numbers for JSON serialization
+    const orderResponse = {
+      ...order,
+      total: Number(order.total),
+      orderItems: order.orderItems.map(oi => ({
+        ...oi,
+        itemPrice: Number(oi.itemPrice),
+      })),
+    };
+
+    return NextResponse.json({ order: orderResponse }, { status: 201 });
   } catch (error) {
     console.error("Order creation error:", error);
     return NextResponse.json(

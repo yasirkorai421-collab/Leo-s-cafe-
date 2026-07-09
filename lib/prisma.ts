@@ -9,14 +9,13 @@ import { PrismaPg } from "@prisma/adapter-pg";
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
 // Create connection pool for better scalability
-const connectionString = process.env.DATABASE_URL;
+// Forcefully prioritize DIRECT_URL because DATABASE_URL might be polluted by system environment variables
+const connectionString = process.env.DIRECT_URL || process.env.DATABASE_URL;
 
 const pool = new Pool({ connectionString });
 const adapter = new PrismaPg(pool);
 
-export const prisma =
-  globalForPrisma.prisma ||
-  new PrismaClient({
+export const prisma = new PrismaClient({
     adapter,
     log:
       process.env.NODE_ENV === "development"

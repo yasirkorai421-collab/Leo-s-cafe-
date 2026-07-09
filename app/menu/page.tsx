@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Breadcrumb from "@/components/Breadcrumb";
 import MenuDisplay from "@/components/MenuDisplay";
-import { categories, menuData } from "@/lib/menu-data";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -31,7 +30,57 @@ export const metadata: Metadata = {
   },
 };
 
-export default function MenuPage() {
+async function getMenuData() {
+  try {
+    // Use direct Prisma call instead of fetch since we're on the server
+    const { prisma } = await import('@/lib/prisma');
+    
+    const categories = await prisma.category.findMany({
+      where: {
+        isActive: true,
+      },
+      include: {
+        menuItems: {
+          where: {
+            isActive: true,
+          },
+          orderBy: {
+            name: 'asc',
+          },
+        },
+      },
+      orderBy: {
+        sortOrder: 'asc',
+      },
+    });
+
+    // Transform to the format expected by the frontend
+    const menuData: Record<string, any[]> = {};
+    const categoryNames: string[] = [];
+
+    categories.forEach((category) => {
+      categoryNames.push(category.name);
+      menuData[category.name] = category.menuItems.map((item) => ({
+        id: item.id,
+        name: item.name,
+        slug: item.slug,
+        description: item.description,
+        price: Number(item.price),
+        imageUrl: item.imageUrl,
+        isAvailable: item.isAvailable,
+      }));
+    });
+
+    return { categories: categoryNames, menuData };
+  } catch (error) {
+    console.error('Error fetching menu:', error);
+    // Return empty data as fallback
+    return { categories: [], menuData: {} };
+  }
+}
+
+export default async function MenuPage() {
+  const { categories, menuData } = await getMenuData();
   return (
     <main style={{ background: "var(--bg-page)" }}>
       {/* ── Page Hero Banner ── */}

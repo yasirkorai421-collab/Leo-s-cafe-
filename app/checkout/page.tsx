@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { useCart } from "@/store/cart";
 import { createClient } from "@/utils/supabase/client";
 import Image from "next/image";
+import ClearOldCartItems from "../cart/clear-old-items";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -63,7 +64,8 @@ export default function CheckoutPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to create order");
+        const errorMsg = data.details ? `${data.error}: ${data.details}` : (data.error || "Failed to create order");
+        throw new Error(errorMsg);
       }
 
       clearCart();
@@ -119,17 +121,31 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen bg-background py-8">
+      <ClearOldCartItems />
       <div className="container mx-auto px-4 max-w-5xl">
         <h1 className="font-heading text-3xl font-bold mb-8">Checkout</h1>
 
         {error && (
-          <div className="mb-6 rounded-lg bg-red-50 border border-red-200 p-4 text-red-800 flex items-start gap-3">
-            <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd"/>
-            </svg>
-            <div>
-              <h3 className="font-semibold mb-1">Order Failed</h3>
-              <p>{error}</p>
+          <div className="mb-6 rounded-lg bg-red-50 border border-red-200 p-4 text-red-800">
+            <div className="flex items-start gap-3">
+              <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd"/>
+              </svg>
+              <div className="flex-1">
+                <h3 className="font-semibold mb-1">Order Failed</h3>
+                <p className="mb-3">{error}</p>
+                {error.includes('Missing items') && (
+                  <button
+                    onClick={() => {
+                      clearCart();
+                      router.push('/menu');
+                    }}
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-colors"
+                  >
+                    Clear Cart & Start Fresh
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         )}
