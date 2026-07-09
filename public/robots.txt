@@ -1,0 +1,14 @@
+# Leo's Café - Robots.txt
+# Allow all search engines to crawl public pages
+
+User-agent: *
+Allow: /
+
+# Block admin, API, delivery, and auth routes
+Disallow: /admin/
+Disallow: /api/
+Disallow: /delivery/
+Disallow: /auth/
+
+# Sitemap location
+Sitemap: https://leo-s-cafe.vercel.app/sitemap.xml

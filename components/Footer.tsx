@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { SCHEDULE } from "@/lib/hours";
 
 export default function Footer() {
   return (
@@ -15,14 +16,6 @@ export default function Footer() {
             crispy burgers, and fresh shawarmas. We serve quality fast food made with care.
           </p>
           <div className="flex space-x-4">
-            <a 
-              href="#" 
-              className="flex items-center justify-center text-white hover:bg-accent transition-colors" 
-              style={{ width: '56px', height: '56px', minWidth: '56px', minHeight: '56px', background: '#2a2a2a', borderRadius: '50%' }}
-              aria-label="Twitter"
-            >
-              <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
-            </a>
             <a 
               href="https://www.facebook.com/Leo450.1/" 
               target="_blank" 
@@ -50,13 +43,12 @@ export default function Footer() {
         <div>
           <h3 className="font-heading font-bold text-white text-xl mb-6">Open Hours</h3>
           <ul className="space-y-3">
-            <li className="flex justify-between items-center text-[#ccc] text-base"><span className="w-2/5 sm:w-1/3">Monday</span><span className="text-sm sm:text-base">12:01 PM - 11:30 PM</span></li>
-            <li className="flex justify-between items-center text-[#ccc] text-base"><span className="w-2/5 sm:w-1/3">Tuesday</span><span className="text-sm sm:text-base">12:01 PM - 11:30 PM</span></li>
-            <li className="flex justify-between items-center text-[#ccc] text-base"><span className="w-2/5 sm:w-1/3">Wednesday</span><span className="text-sm sm:text-base">12:01 PM - 11:30 PM</span></li>
-            <li className="flex justify-between items-center text-[#ccc] text-base"><span className="w-2/5 sm:w-1/3">Thursday</span><span className="text-sm sm:text-base">12:01 PM - 11:30 PM</span></li>
-            <li className="flex justify-between items-center text-[#ccc] text-base"><span className="w-2/5 sm:w-1/3">Friday</span><span className="text-sm sm:text-base">3:00 PM - 11:30 PM</span></li>
-            <li className="flex justify-between items-center text-[#ccc] text-base"><span className="w-2/5 sm:w-1/3">Saturday</span><span className="text-sm sm:text-base">12:01 PM - 11:30 PM</span></li>
-            <li className="flex justify-between items-center text-[#ccc] text-base"><span className="w-2/5 sm:w-1/3">Sunday</span><span className="text-sm sm:text-base">12:01 PM - 11:30 PM</span></li>
+            {SCHEDULE.map((item) => (
+              <li key={item.day} className="flex justify-between items-center text-[#ccc] text-base">
+                <span className="w-2/5 sm:w-1/3">{item.day}</span>
+                <span className="text-sm sm:text-base">{item.open} - {item.close}</span>
+              </li>
+            ))}
           </ul>
         </div>
 
@@ -64,41 +56,64 @@ export default function Footer() {
         <div>
           <h3 className="font-heading font-bold text-white text-xl mb-6">Instagram</h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="aspect-square bg-gray-800 relative overflow-hidden">
+            {[
+              "https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=200&h=200&fit=crop",
+              "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=200&h=200&fit=crop",
+              "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=200&h=200&fit=crop",
+              "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?q=80&w=200&h=200&fit=crop",
+              "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?q=80&w=200&h=200&fit=crop",
+              "https://images.unsplash.com/photo-1551538827-9c037cb4f32a?q=80&w=200&h=200&fit=crop",
+            ].map((src, i) => (
+              <a
+                key={i}
+                href="https://www.instagram.com/Leo450.1/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="aspect-square bg-gray-800 relative overflow-hidden block hover:opacity-80 transition-opacity"
+              >
                 <Image
-                  src={`https://images.unsplash.com/photo-1544148103-0773bf10d330?q=80&w=200&h=200&fit=crop&auto=format`}
-                  alt="Instagram feed"
+                  src={src}
+                  alt={`Leo's Café food photo ${i + 1}`}
                   fill
                   sizes="(max-width: 640px) 50vw, 100px"
                   className="object-cover"
                   loading="lazy"
                 />
-              </div>
+              </a>
             ))}
           </div>
         </div>
 
-        {/* Newsletter */}
+        {/* Contact Info */}
         <div>
-          <h3 className="font-heading font-bold text-white text-xl mb-6">Newsletter</h3>
-          <p className="mb-6 leading-relaxed text-base">
-            Stay updated with our latest offers, new menu items, and special events.
-          </p>
-          <form className="flex flex-col gap-3">
-            <input 
-              type="email" 
-              placeholder="Enter email address" 
-              className="w-full bg-[#2a2a2a] text-white placeholder-gray-400 px-4 py-4 focus:outline-none text-base"
-              style={{ minHeight: '52px' }}
-            />
-            <button 
-              className="w-full bg-accent hover:bg-accent-hover text-white font-bold py-4 transition-colors text-base"
-              style={{ minHeight: '52px' }}
-            >
-              Subscribe
-            </button>
-          </form>
+          <h3 className="font-heading font-bold text-white text-xl mb-6">Contact Us</h3>
+          <ul className="space-y-4">
+            <li>
+              <div className="text-sm text-gray-400 mb-1">Phone</div>
+              <a href="tel:+923361171626" className="text-accent hover:underline text-base font-semibold">
+                +92 336 1171626
+              </a>
+            </li>
+            <li>
+              <div className="text-sm text-gray-400 mb-1">WhatsApp</div>
+              <a 
+                href="https://wa.me/923361171626" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-accent hover:underline text-base font-semibold"
+              >
+                Message Us
+              </a>
+            </li>
+            <li>
+              <div className="text-sm text-gray-400 mb-1">Location</div>
+              <p className="text-base">
+                New Zain Plaza<br />
+                Near THQ Hospital<br />
+                Kot Addu, Punjab
+              </p>
+            </li>
+          </ul>
         </div>
       </div>
 

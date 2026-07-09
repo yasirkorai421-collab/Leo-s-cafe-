@@ -5,25 +5,25 @@ import Image from "next/image";
 
 const testimonials = [
   {
-    name: "Arturo Guibuge",
+    name: "Ahmed Khan",
     role: "Regular Customer",
     img: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=200&h=200&fit=crop",
     quote:
-      "Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove.",
+      "Best pizza in Kot Addu! The Leo's Special is loaded with toppings and always arrives hot. I've been ordering here for over a year now.",
   },
   {
-    name: "Sophia Lennox",
-    role: "Food Blogger",
+    name: "Fatima Iqbal",
+    role: "Local Resident",
     img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&h=200&fit=crop",
     quote:
-      "A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth.",
+      "Their zinger burger is crispy and fresh every time. Great taste, good portions, and the staff is always friendly. Highly recommend!",
   },
   {
-    name: "Marcus Wilde",
-    role: "Food Critic",
+    name: "Hassan Ali",
+    role: "Food Enthusiast",
     img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&h=200&fit=crop",
     quote:
-      "Even the all-powerful Pointing has no control about the blind texts — it is an almost unorthographic life. One day however a small line of blind text by the name of Lorem Ipsum decided to leave.",
+      "Quality food at reasonable prices. The chicken shawarma and pasta are my favorites. Perfect spot for late-night cravings.",
   },
 ];
 

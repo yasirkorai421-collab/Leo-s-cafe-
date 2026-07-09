@@ -20,10 +20,6 @@
 }
 
 @layer base {
-  * {
-    border-radius: 0 !important; /* Force sharp corners everywhere */
-  }
-  
   body {
     background-color: var(--bg-page);
     color: var(--color-body-gray);

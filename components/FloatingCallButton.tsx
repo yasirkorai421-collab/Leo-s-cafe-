@@ -1,36 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { createClient } from "@/utils/supabase/client";
+import { useState } from "react";
 
 export default function FloatingCallButton() {
   const [isHovered, setIsHovered] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const supabase = createClient();
-
-  // Check authentication status
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setIsAuthenticated(!!user);
-    };
-    
-    checkAuth();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsAuthenticated(!!session?.user);
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [supabase.auth]);
-
-  // Don't show if not authenticated
-  if (!isAuthenticated) {
-    return null;
-  }
 
   return (
     <a

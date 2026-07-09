@@ -220,9 +220,11 @@ export default function LoginPage() {
                 <input type="checkbox" className="w-4 h-4 text-accent border-gray-300 rounded focus:ring-accent" />
                 <span className="ml-2 text-gray-600">Remember me</span>
               </label>
-              <a href="#" className="font-semibold hover:underline" style={{ color: "var(--color-accent)" }}>
-                Forgot password?
-              </a>
+              <p className="text-gray-600 text-sm">
+                Need help? <a href="https://wa.me/923361171626" target="_blank" rel="noopener noreferrer" className="font-semibold hover:underline" style={{ color: "var(--color-accent)" }}>
+                  WhatsApp us
+                </a>
+              </p>
             </div>
 
             {/* Sign In Button */}
