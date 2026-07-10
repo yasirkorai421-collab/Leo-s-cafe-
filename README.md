@@ -85,23 +85,15 @@ NEXT_PUBLIC_SUPABASE_URL="https://your-project.supabase.co"
 NEXT_PUBLIC_SUPABASE_ANON_KEY="your-anon-key"
 SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"
 
-# Admin Credentials
-ADMIN_EMAIL="admin@leoscafe.com"
-ADMIN_PASSWORD="your-secure-password"
-ADMIN_PHONE="+923001234567"
-ADMIN_NAME="Admin"
-
-# Delivery Personnel
-DELIVERY_PERSONNEL="Rider 1|rider1@leoscafe.com|rider1pass|+923001111111"
 
 # SMS Configuration
-HOST_PHONE_NUMBER="+923001234567"
+HOST_PHONE_NUMBER="Your phone number" 
 MSG91_API_KEY="your-msg91-api-key"
 # ... other SMS settings
 
 # Payment Settings
-JAZZCASH_NUMBER="03001234567"
-EASYPAISA_NUMBER="03001234567"
+JAZZCASH_NUMBER="Your Account Number"
+EASYPAISA_NUMBER="Your Account Number"
 # ... other payment settings
 ```
 
