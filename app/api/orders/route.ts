@@ -106,7 +106,7 @@ export async function POST(request: Request) {
       total += itemTotal;
 
       return {
-        itemId: cartItem.itemId,
+        item: { connect: { id: cartItem.itemId } },
         quantity: cartItem.quantity,
         customization: cartItem.customizations ? cartItem.customizations : undefined,
         itemPrice: menuItem.price,

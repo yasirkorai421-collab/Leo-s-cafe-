@@ -7,6 +7,7 @@ import FloatingCartButton from "@/components/FloatingCartButton";
 import FloatingCallButton from "@/components/FloatingCallButton";
 import BottomNavBar from "@/components/BottomNavBar";
 import ToasterProvider from "@/components/ToasterProvider";
+import PublicLayoutWrapper from "@/components/PublicLayoutWrapper";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -47,14 +48,21 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col font-sans bg-page text-body-gray">
         <ToasterProvider />
-        <SiteHeader />
-        {children}
-        <Footer />
         
-        {/* Mobile Enhancements */}
-        <FloatingCartButton />
-        <FloatingCallButton />
-        <BottomNavBar />
+        <PublicLayoutWrapper>
+          <SiteHeader />
+        </PublicLayoutWrapper>
+
+        {children}
+        
+        <PublicLayoutWrapper>
+          <Footer />
+          {/* Mobile Enhancements */}
+          <FloatingCartButton />
+          <FloatingCallButton />
+          <BottomNavBar />
+        </PublicLayoutWrapper>
+        
         <Analytics />
       </body>
     </html>

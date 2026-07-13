@@ -22,10 +22,6 @@ export default function SignUpPage() {
   const [success, setSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [otpSent, setOtpSent] = useState(false);
-  const [otp, setOtp] = useState("");
-  const [otpVerified, setOtpVerified] = useState(false);
-  const [sendingOtp, setSendingOtp] = useState(false);
   const csrfToken = useMemo(() => {
     if (typeof window === "undefined") return "otp-token";
     return `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
@@ -42,79 +38,8 @@ export default function SignUpPage() {
     });
   };
 
-  const handleSendOTP = async () => {
-    const normalizedPhone = formData.phone.trim().replace(/\s+/g, "");
-    if (!normalizedPhone || !/^(?:\+92|92|0)3\d{9}$/.test(normalizedPhone)) {
-      setError("Please enter a valid Pakistani phone number");
-      return;
-    }
-
-    setSendingOtp(true);
-    setError("");
-
-    try {
-      const response = await fetch("/api/otp/send", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-csrf-token": csrfToken },
-        body: JSON.stringify({ phone: normalizedPhone, csrfToken }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to send OTP");
-      }
-
-      setOtpSent(true);
-      if (data.message) {
-        alert(data.message);
-      }
-    } catch (err: any) {
-      setError(err.message || "Failed to send OTP");
-    } finally {
-      setSendingOtp(false);
-    }
-  };
-
-  const handleVerifyOTP = async () => {
-    if (!otp || otp.length !== 6) {
-      setError("Please enter a valid 6-digit OTP");
-      return;
-    }
-
-    setIsLoading(true);
-    setError("");
-
-    try {
-      const response = await fetch("/api/otp/verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-csrf-token": csrfToken },
-        body: JSON.stringify({ phone: formData.phone, otp, csrfToken }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to verify OTP");
-      }
-
-      setOtpVerified(true);
-    } catch (err: any) {
-      setError(err.message || "Failed to verify OTP");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Check if OTP is verified
-    if (!otpVerified) {
-      setError("Please verify your phone number first");
-      return;
-    }
-    
     setIsLoading(true);
     setError("");
 
@@ -132,22 +57,24 @@ export default function SignUpPage() {
     }
 
     try {
-      const supabase = createClient();
-      const { error: signUpError } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          data: {
-            full_name: formData.name,
-            phone: formData.phone,
-            birthday: formData.birthday,
-          },
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          name: formData.name,
+          phone: formData.phone,
+          birthday: formData.birthday,
+        }),
       });
 
-      if (signUpError) {
-        setError(signUpError.message);
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Failed to create account");
         setIsLoading(false);
         return;
       }
@@ -297,66 +224,14 @@ export default function SignUpPage() {
                     placeholder="03001234567"
                     required
                     pattern="[0-9]{11}"
-                    disabled={otpVerified}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent transition-all outline-none disabled:bg-gray-100"
+                    disabled={isLoading}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent transition-all outline-none"
                   />
                 </div>
-                {!otpVerified && (
-                  <button
-                    type="button"
-                    onClick={handleSendOTP}
-                    disabled={sendingOtp || !formData.phone}
-                    className="px-4 py-3 bg-accent text-white rounded-lg hover:opacity-90 disabled:opacity-50 whitespace-nowrap font-medium"
-                  >
-                    {sendingOtp ? "Sending..." : otpSent ? "Resend" : "Send OTP"}
-                  </button>
-                )}
-                {otpVerified && (
-                  <div className="flex items-center px-4 py-3 bg-green-100 text-green-700 rounded-lg">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
-                    </svg>
-                  </div>
-                )}
               </div>
               <p className="mt-1 text-xs text-gray-500">11 digits starting with 03</p>
             </div>
 
-            {/* OTP Field - Show only after OTP is sent */}
-            {otpSent && !otpVerified && (
-              <div>
-                <label htmlFor="otp" className="block text-sm font-semibold mb-2 text-gray-700">
-                  Enter OTP
-                </label>
-                <div className="flex gap-2">
-                  <div className="relative flex-1">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                      </svg>
-                    </div>
-                    <input
-                      id="otp"
-                      type="text"
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                      placeholder="123456"
-                      maxLength={6}
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent transition-all outline-none"
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleVerifyOTP}
-                    disabled={isLoading || otp.length !== 6}
-                    className="px-4 py-3 bg-green-600 text-white rounded-lg hover:opacity-90 disabled:opacity-50 whitespace-nowrap font-medium"
-                  >
-                    {isLoading ? "Verifying..." : "Verify"}
-                  </button>
-                </div>
-                <p className="mt-1 text-xs text-gray-500">Enter the 6-digit code sent to your phone</p>
-              </div>
-            )}
 
             {/* Birthday Field */}
             <div>
@@ -486,7 +361,7 @@ export default function SignUpPage() {
             {/* Sign Up Button */}
             <button
               type="submit"
-              disabled={isLoading || !otpVerified}
+              disabled={isLoading}
               className="w-full py-3.5 px-4 text-white font-bold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               style={{ 
                 background: 'linear-gradient(135deg, #ff6b35 0%, #f7931e 100%)',
@@ -509,11 +384,7 @@ export default function SignUpPage() {
                 </>
               )}
             </button>
-            {!otpVerified && (
-              <p className="text-sm text-center text-gray-600">
-                Please verify your phone number to continue
-              </p>
-            )}
+
           </form>
 
           {/* Divider */}
